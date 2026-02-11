@@ -13,7 +13,7 @@ export default defineConfig({
 				src: "./src/assets/logo.svg",
 				replacesTitle: true
 			},
-			favicon: 'favicon.svg',
+			favicon: './src/assets/favicon.ico',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/techgems/static-components' }
 			],
