@@ -1,0 +1,99 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<br />
+
+<h2>Hello World Component</h2>
+
+<hello-world-component></hello-world-component>
+
+<br />
+<br />
+
+<h2>Simple Parameter Component</h2>
+
+<simple-parameters sample="text"></simple-parameters>
+
+<br />
+<br />
+
+
+<h2>Parameter Component with Children</h2>
+
+<parameters-children sample="text">
+    <div>Child html</div>
+</parameters-children>
+
+<br />
+
+<h2>Parameter Component with Children - Fallback</h2>
+
+<parameters-children sample="text"></parameters-children>
+
+<br />
+
+<h2>Slotted Component</h2>
+
+<card-sample-component>
+    <slot name="cardHeader">
+        <h4>This is your first slot.</h4>
+    </slot>
+    <h4>Child Content</h4>
+    <slot name="cardFooter">
+        <h4>This is your second slot.</h4>
+    </slot>
+</card-sample-component>
+
+<br />
+
+<h2>Slotted Component with nested component (which also has slots)</h2>
+
+<card-sample-component>
+    <slot name="cardHeader">
+        <h4>This is your first slot.</h4>
+    </slot>
+    <slot name="cardFooter">
+        <card-sample-component sample="text">
+            <slot name="cardHeader">
+                <h4>This is your first nested slot.</h4>
+            </slot>
+            <slot name="cardFooter">
+                <h4>This is your second nested slot.</h4>
+                <hello-world></hello-world>
+                <parameters-children sample="text">
+                    <div>Child html</div>
+                </parameters-children>
+            </slot>
+        </card-sample-component>
+    </slot>
+</card-sample-component>
+
+<br />
+
+<h2>Slotted Component with nested component (which doesn't have slots)</h2>
+<card-sample-component>
+    <slot name="cardHeader">
+        <h4>This is your first slot.</h4>
+    </slot>
+    <hello-world-component />
+    <slot name="cardFooter">
+        <h2>This is your second slot.</h2>
+    </slot>
+</card-sample-component>
+
+<h2>Slotted Component with Fallback</h2>
+
+<card-sample-component>
+    <slot name="cardHeader">
+        <h4>This is your first slot.</h4>
+    </slot>
+</card-sample-component>

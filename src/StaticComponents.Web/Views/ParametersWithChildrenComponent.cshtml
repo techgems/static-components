@@ -1,0 +1,15 @@
+﻿@using StaticComponents.Web.Views;
+@model ParametersWithChildrenComponent
+
+<span>@Model.Sample</span>
+
+<div>
+    @if (Model.IsChildContentNullOrEmpty)
+    {
+        <h5>This is the fallback.</h5>
+    }
+    else
+    {
+        @Model.ChildContent    
+    }
+</div>

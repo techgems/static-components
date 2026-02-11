@@ -1,0 +1,42 @@
+﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using System;
+using System.Threading.Tasks;
+
+namespace TechGems.StaticComponents;
+
+
+[HtmlTargetElement("slot")]
+public class StaticComponentSlot : StaticComponent
+{
+    public StaticComponentSlot()
+    {
+    }
+
+    /// <summary>
+    /// The name of the slot to be rendered inside a static component. It is internally used as a dictionary key.
+    /// </summary>
+    [HtmlAttributeName("name")]
+    public string Name { get; set; } = "";
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        if (string.IsNullOrEmpty(Name))
+            throw new ArgumentException("Slot Name is mandatory.");
+
+        if (ParentComponent is null)
+            throw new ArgumentNullException($"A slot tag helper component cannot be used without a parent component.");
+
+        //Get the content of the slot and insert it in the parent component.
+        var childContent = await output.GetChildContentAsync();
+
+        if (childContent is null)
+            throw new ArgumentNullException("A slot must have child content in order to work as intended. Child content cannot be null.");
+
+        var result = ParentComponent.NamedSlots.TryAdd(Name, childContent);
+
+        if (!result)
+            throw new ArgumentException("A slot identifier has been repeated. Slots require unique name values when used inside a single parent element");
+
+        output.SuppressOutput();
+    }
+}
