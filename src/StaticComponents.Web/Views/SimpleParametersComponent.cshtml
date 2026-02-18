@@ -1,4 +1,18 @@
 ﻿@using StaticComponents.Web.Views;
 @model SimpleParametersComponent
 
-<span>@Model.Sample</span>
+<div x-data="alpineState()">
+    <span x-on:click="toggleVal">@Model.Sample</span>
+</div>
+
+<script static-script type="text/javascript">
+    function alpineState() {
+        return {
+            showTag: true,
+            test: '@("I am a nice C# string.")',
+            toggleVal: function() {
+                this.showTag = !this.showTag;
+            }
+        };
+    }
+</script>
