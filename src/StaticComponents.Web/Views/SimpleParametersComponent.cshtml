@@ -2,7 +2,8 @@
 @model SimpleParametersComponent
 
 <div x-data="alpineState()">
-    <span x-on:click="toggleVal">@Model.Sample</span>
+    <span x-on:click="toggleVal">Click me to show something</span>
+    <span x-show="showTag">I am a tag</span>
 </div>
 
 <script static-script type="text/javascript">
