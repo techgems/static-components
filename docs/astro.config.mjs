@@ -48,6 +48,7 @@ export default defineConfig({
 						{ label: 'Child Content and Slots', slug: 'advanced-usage/child-content-and-slots' },
 						{ label: 'Override Default Rendering', slug: 'advanced-usage/override-rendering' },
 						{ label: 'AlpineJS', slug: 'advanced-usage/alpine' },
+						{ label: 'Static Scripts', slug: 'advanced-usage/static-scripts' }
 						//{ label: 'HTMX', slug: 'advanced-usage/htmx' }
 					]
 				},

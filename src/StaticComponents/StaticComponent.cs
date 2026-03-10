@@ -107,12 +107,6 @@ public abstract class StaticComponent : TagHelper
         return htmlHelper;
     }
 
-
-    private void SetParentComponentStack(TagHelperContext context, Stack<StaticComponent> parentComponentStack)
-    {
-        context.Items[_componentStackKey] = parentComponentStack;
-    }
-
     private Stack<StaticComponent> GetParentComponentStack(TagHelperContext context)
     {
         return (context.Items[_componentStackKey] as Stack<StaticComponent>)!;
@@ -133,6 +127,7 @@ public abstract class StaticComponent : TagHelper
         return slot!;
     }
 
+    /// <inheritdoc/>
     public override sealed void Init(TagHelperContext context)
     {
         if (!context.Items.ContainsKey(_componentStackKey))
@@ -142,7 +137,7 @@ public abstract class StaticComponent : TagHelper
             ParentComponent = null;
             parentComponentStack.Push(this);
 
-            SetParentComponentStack(context, parentComponentStack);
+            context.Items[_componentStackKey] = parentComponentStack;
         }
         else
         {
@@ -168,7 +163,6 @@ public abstract class StaticComponent : TagHelper
     /// <exception cref="ArgumentNullException"></exception>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-
         if (ViewContext is null)
         {
             throw new ArgumentNullException(nameof(ViewContext));
@@ -178,10 +172,8 @@ public abstract class StaticComponent : TagHelper
         {
             throw new ArgumentNullException($"{nameof(_razorViewRoute)} cannot be null.");
         }
-        else
-        {
-            await RenderPartialView(_razorViewRoute, output);
-        }
+
+        await RenderPartialView(_razorViewRoute, output);        
 
         if (this is not StaticComponentSlot)
         {
@@ -191,6 +183,19 @@ public abstract class StaticComponent : TagHelper
                 stack.Pop();
             }
         }
+    }
+
+    public void InjectScriptOnlyOnce()
+    {
+        var xx = $"{_razorViewRoute}.js";
+        //Retrieve javascript file content.
+        var contentOfFile = "";
+
+        ViewContext.HttpContext.Items["RegisteredTypes"] = new List<string>() { GetType().Name }; //ADD TO EXISTING OR CREATE NEW.
+
+        ViewContext.HttpContext.Items[$"{StaticComponentsConstants.StaticScriptKey}_{GetType().Name}"] = contentOfFile;
+
+        
     }
 
     /// <summary>
