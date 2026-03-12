@@ -88,6 +88,7 @@ public class StaticScript : StaticComponent
             {
                 AddScriptToArray(scriptContent, output.Attributes);
                 ViewContext.HttpContext.Items[$"{StaticComponentsConstants.StaticScriptOnceKey}_{renderOnceTypeName}"] = true;
+                return;
             }
 
             return;
