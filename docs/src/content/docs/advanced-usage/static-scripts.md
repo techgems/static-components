@@ -4,7 +4,7 @@ title: 'Static Scripts'
 
 Static Components gives you a set of tools to do more with scripts than ASP.NET Core allows you. Static Components are essentially compiler enhanced versions of Razor Partials. Normally partials cannot use Razor sections, which is why using scripts in partials is normally discouraged.
 
-The `static-script` tag helper was created to alleviate that problem. It allows you to "teleport" a script so that it is not rendered inline. It allows you to tell a component when a script inside a static component should only be rendered once. This gives you a lot of flexibility when it comes to adding javascript to your static components, particularly by keeping related code in the same place. It is important to know that `static-script` interacts internally only with Static Components, meaning that it will **not** work when used directly in a view or partial view that doesn't belong to a static component's execution context. 
+The `static-script` tag helper was created to alleviate that problem. It allows you to "teleport" a script so that it is not rendered inline. It allows you to tell a component when a script inside a static component should only be rendered once. This gives you a lot of flexibility when it comes to adding javascript to your static components, particularly by keeping related code in the same place. Static scripts should work both when used inside Static Components as well as regular partial views or ViewComponents.
 
 The `static-script` tag helper on it's own does nothing though, but by including it allows you to use the following properties on a regular `<script>` tag.
 
