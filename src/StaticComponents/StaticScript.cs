@@ -78,6 +78,12 @@ public class StaticScript : StaticComponent
 
         if (TeleportScript)
         {
+            if (RenderOnce is null)
+            {
+                AddScriptToArray(scriptContent, output.Attributes);
+                return;
+            }
+
             if (RenderOnce is not null && !componentTypeInOnceArray)
             {
                 AddScriptToArray(scriptContent, output.Attributes);
@@ -85,7 +91,6 @@ public class StaticScript : StaticComponent
                 return;
             }
 
-            AddScriptToArray(scriptContent, output.Attributes);
             return;
         }
 

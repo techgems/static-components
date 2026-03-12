@@ -185,19 +185,6 @@ public abstract class StaticComponent : TagHelper
         }
     }
 
-    public void InjectScriptOnlyOnce()
-    {
-        var xx = $"{_razorViewRoute}.js";
-        //Retrieve javascript file content.
-        var contentOfFile = "";
-
-        ViewContext.HttpContext.Items["RegisteredTypes"] = new List<string>() { GetType().Name }; //ADD TO EXISTING OR CREATE NEW.
-
-        ViewContext.HttpContext.Items[$"{StaticComponentsConstants.StaticScriptKey}_{GetType().Name}"] = contentOfFile;
-
-        
-    }
-
     /// <summary>
     /// Uses the HtmlHelper to render the partial view. Defaults tag name to null and adds child content if there was any.
     /// Will send the child class as the view model for the partial view.

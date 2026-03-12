@@ -6,7 +6,7 @@
     <span x-show="showTag">I am a tag</span>
 </div>
 
-<script static-script type="text/javascript">
+<script static-script type="text/javascript" render-once="Model" teleport-script>
     function alpineState() {
         return {
             showTag: true,
