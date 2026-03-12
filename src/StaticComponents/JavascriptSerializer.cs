@@ -13,9 +13,10 @@ public static class JavascriptConvert
     /// <summary>
     /// Serialize any CLR object into a JavaScript Object Literal.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The object to serialize into a JavaScript Object Literal.</param>
+    /// <param name="useSingleQuotesOnStringValues">Set this to true when you want string values to be serialized with single quotes instead. Useful when using this function as part of an HTML attribute.</param>
     /// <returns></returns>
-    public static IHtmlContent SerializeObject(object value)
+    public static IHtmlContent SerializeObject(object value, bool useSingleQuotesOnStringValues = false)
     {
         using (var stringWriter = new StringWriter())
         using (var jsonWriter = new JsonTextWriter(stringWriter))
@@ -26,6 +27,11 @@ public static class JavascriptConvert
             };
 
             // We don't want quotes around object names
+            if(useSingleQuotesOnStringValues)
+            {
+                jsonWriter.QuoteChar = '\'';
+            }
+            
             jsonWriter.QuoteName = false;
             serializer.Serialize(jsonWriter, value);
 

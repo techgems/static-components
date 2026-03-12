@@ -78,14 +78,18 @@ public class StaticScript : StaticComponent
 
         if (TeleportScript)
         {
+            if (RenderOnce is null)
+            {
+                AddScriptToArray(scriptContent, output.Attributes);
+                return;
+            }
+
             if (RenderOnce is not null && !componentTypeInOnceArray)
             {
                 AddScriptToArray(scriptContent, output.Attributes);
                 ViewContext.HttpContext.Items[$"{StaticComponentsConstants.StaticScriptOnceKey}_{renderOnceTypeName}"] = true;
-                return;
             }
 
-            AddScriptToArray(scriptContent, output.Attributes);
             return;
         }
 
