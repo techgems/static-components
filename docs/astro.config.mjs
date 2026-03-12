@@ -52,11 +52,12 @@ export default defineConfig({
 						//{ label: 'HTMX', slug: 'advanced-usage/htmx' }
 					]
 				},
-				/*
-				{
-					label: 'How to build a UI library',
-					autogenerate: { directory: 'guide' },
-				},*/
+								{
+					label: 'Miscellaneous',
+					items: [
+						{ label: 'AI Usage', slug: 'miscellaneous/using-ai' }
+					]
+				}
 			],
 		}),
 	],
