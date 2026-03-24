@@ -43,16 +43,22 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Advanced Usage',
+					label: 'Features',
 					items: [
-						{ label: 'Child Content and Slots', slug: 'advanced-usage/child-content-and-slots' },
-						{ label: 'Override Default Rendering', slug: 'advanced-usage/override-rendering' },
-						{ label: 'AlpineJS', slug: 'advanced-usage/alpine' },
-						{ label: 'Static Scripts', slug: 'advanced-usage/static-scripts' }
-						//{ label: 'HTMX', slug: 'advanced-usage/htmx' }
+						{ label: 'Child Content and Slots', slug: 'features/child-content-and-slots' },
+						{ label: 'Static Scripts', slug: 'features/static-scripts' },
+						{ label: 'JavaScript Object Serialization', slug: 'features/javascript-object-serialization' }
 					]
 				},
-								{
+				{
+					label: 'Advanced Usage',
+					items: [
+						{ label: 'Integrating AlpineJS', slug: 'advanced-usage/alpine' },
+						{ label: 'Override Default Rendering', slug: 'advanced-usage/override-rendering' },
+						{ label: 'Writing your own UI libraries', slug: 'advanced-usage/writing-your-own-ui-libraries' }
+					]
+				},
+				{
 					label: 'Miscellaneous',
 					items: [
 						{ label: 'AI Usage', slug: 'miscellaneous/using-ai' }

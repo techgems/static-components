@@ -80,7 +80,7 @@ This should in turn be called like this:
 
 ```
 
-It's important to note that your razor template will be rendered as a partial that must use the component class as it's model. It is possible to override this, but more on that can be found in [Advanced usage](/advanced-usage).
+It's important to note that your razor template will be rendered as a partial that must use the component class as it's model. It is possible to override this, but more on that can be found in [Advanced usage](/advanced-usage/override-rendering).
 
 ## Child Content
 
@@ -124,4 +124,4 @@ and you'd be able to invoke it in your code like this:
 
 ### Summary
 
-These examples should cover most of use cases for this library. However, you can override default behaviour should you need to. Look into [Advanced Usage](/docs/advanced-usage) for more information about overriding more defaults.
+These examples should cover most of use cases for this library. However, you can override default behaviour should you need to. Look into [Advanced Usage](/docs/advanced-usage/override-rendering) for more information about overriding more defaults.

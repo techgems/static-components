@@ -37,9 +37,7 @@ The one thing that is worthy of note is that the implementation of `RenderPartia
 - output.Content: Which is set as the output of the partial view.
 - output.TagName: Which is set to null.
 
-If you need to avoid using `RenderPartialView` altogether, you can, the implementation isn't too complex since this library is a single file library.
-
-You can also use the HtmlHelper method inside the base class directly by calling inside your implementation of `ProcessAsync`:
+If you need to avoid using `RenderPartialView` altogether, you can by using the HtmlHelper method inside the base class directly by calling inside your implementation of `ProcessAsync`. That said `RenderPartialView` will fit 99% of use cases.
 
 ```csharp
 using Microsoft.AspNetCore.Razor.TagHelpers;
