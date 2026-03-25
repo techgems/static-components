@@ -1,0 +1,76 @@
+---
+title: 'StaticScriptRenderer'
+description: 'API reference for the StaticScriptRenderer class (the <render-static-scripts /> tag helper).'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;render-static-scripts /&gt;" variant="success" />
+
+`StaticScriptRenderer` is a tag helper that outputs all scripts that were **teleported** via [`StaticScript`](/spec/static-script) components using the `teleport-script` attribute. It acts as the collection point where deferred scripts are rendered into the page.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## HTML Target Element
+
+```html
+<render-static-scripts />
+```
+
+This is a **self-closing** tag with no end tag (void element).
+
+## Usage
+
+Place `<render-static-scripts />` in your layout, typically just before the closing `</body>` tag:
+
+```razor
+<!-- ~/Pages/Shared/_Layout.cshtml -->
+<html>
+<head>...</head>
+<body>
+    @RenderBody()
+
+    <render-static-scripts />
+</body>
+</html>
+```
+
+Any `<script static-script teleport-script>` blocks in your components will be collected during rendering and output at this location.
+
+## Public Properties
+
+### `ViewContext`
+
+```csharp
+[HtmlAttributeNotBound]
+[ViewContext]
+public ViewContext? ViewContext { get; set; }
+```
+
+The View Context injected by ASP.NET Core at runtime. Used to access `HttpContext.Items`, where teleported scripts are stored. This property should not be set manually.
+
+## Behavior
+
+1. Reads the list of teleported scripts from `HttpContext.Items`.
+2. If no scripts were teleported, **suppresses output entirely** (no HTML is rendered).
+3. If scripts exist, renders them wrapped in HTML comments for easy identification:
+
+```html
+<!-- Static Scripts -->
+<script>console.log("teleported script 1");</script>
+<script>console.log("teleported script 2");</script>
+<!-- Static Scripts End -->
+```
+
+<Aside type="note">
+Only one `<render-static-scripts />` element should be present in your layout. Scripts are consumed from a shared list in `HttpContext.Items`, so placing multiple renderers would cause scripts to render in only the first one encountered.
+</Aside>
+
+## Related
+
+- [StaticScript](/spec/static-script) — The tag helper that teleports scripts
+- [Static Scripts](/features/static-scripts) — Feature guide with detailed examples

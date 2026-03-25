@@ -1,0 +1,136 @@
+---
+title: 'StaticScript'
+description: 'API reference for the StaticScript class (the static-script tag helper).'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: StaticComponent" variant="note" /> <Badge text="HTML Target: &lt;script static-script&gt;" variant="success" />
+
+`StaticScript` is a tag helper that targets `<script>` elements with the `static-script` attribute. It provides advanced script management features: **teleporting** scripts to a consolidated location in the page and **rendering scripts only once** even when a component is used multiple times.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## HTML Target Element
+
+```html
+<script static-script>
+    // Your JavaScript here
+</script>
+```
+
+The `static-script` attribute is required to activate this tag helper on a `<script>` element.
+
+## Usage
+
+### Inline script (default)
+
+Without any additional attributes, the script renders inline at the component's location:
+
+```razor
+<script static-script>
+    console.log("Hello from the component");
+</script>
+```
+
+### Teleported script
+
+Move the script to the location of `<render-static-scripts />` (typically near the end of the `<body>`):
+
+```razor
+<script static-script teleport-script>
+    console.log("Rendered at the bottom of the page");
+</script>
+```
+
+### Render once
+
+Ensure the script renders only a single time, even if the component appears multiple times on the page:
+
+```razor
+<script static-script render-once="@(new MyComponent())">
+    console.log("Only rendered once");
+</script>
+```
+
+### Combined
+
+Teleport **and** render once:
+
+```razor
+<script static-script teleport-script render-once="@(new MyComponent())">
+    // Teleported to the bottom and only rendered once
+</script>
+```
+
+## Public Properties
+
+### `HttpContext`
+
+```csharp
+[HtmlAttributeNotBound]
+public HttpContext HttpContext { get; }
+```
+
+Provides direct access to the current `HttpContext`. Derived from `ViewContext.HttpContext`. This property is not settable from HTML attributes.
+
+### `TeleportScript`
+
+```csharp
+[HtmlAttributeName("teleport-script")]
+public bool TeleportScript { get; set; }
+```
+
+When `true`, the script is **not rendered inline**. Instead, it is stored in `HttpContext.Items` and rendered later at the location of a [`<render-static-scripts />`](/spec/static-script-renderer) tag helper.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `teleport-script` |
+| Default | `false` |
+
+### `RenderOnce`
+
+```csharp
+[HtmlAttributeName("render-once")]
+public object? RenderOnce { get; set; }
+```
+
+When set, the script will only render **once per page** for the given component type, regardless of how many times the component is used. The value should be an instance of the component type — its type name is used as the deduplication key.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `render-once` |
+| Default | `null` (renders every time) |
+
+### `DisableRender`
+
+```csharp
+[HtmlAttributeName("disable-render")]
+public bool DisableRender { get; set; }
+```
+
+When `true`, the script is **not rendered at all**. Useful for conditionally suppressing scripts, for example during AJAX partial responses where the script is not needed.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `disable-render` |
+| Default | `false` |
+
+## Behavior Matrix
+
+| `TeleportScript` | `RenderOnce` | `DisableRender` | Result |
+|---|---|---|---|
+| `false` | `null` | `false` | Script renders inline at the component location. |
+| `true` | `null` | `false` | Script is teleported to `<render-static-scripts />`. |
+| `false` | set | `false` | Script renders inline, but only on the first occurrence. |
+| `true` | set | `false` | Script is teleported, but only on the first occurrence. |
+| any | any | `true` | Script is not rendered. |
+
+## Related
+
+- [StaticScriptRenderer](/spec/static-script-renderer) — The tag helper that outputs teleported scripts
+- [Static Scripts](/features/static-scripts) — Feature guide with detailed examples

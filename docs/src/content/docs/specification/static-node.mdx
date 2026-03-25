@@ -1,0 +1,134 @@
+---
+title: 'StaticNode'
+description: 'API reference for the StaticNode abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: TagHelper" variant="note" />
+
+`StaticNode` is a lightweight abstract base class for creating leaf-level components that **do not support child content or slots**. Like `StaticComponent`, it extends `TagHelper` and renders a Razor partial view with itself as the model, but omits all composition features for simplicity and clarity of intent.
+
+Use `StaticNode` when your component is self-contained and does not need to wrap inner HTML or accept named slots.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents;
+
+namespace YourAssembly.Views.Components;
+
+public class AvatarComponent : StaticNode
+{
+    public string ImageUrl { get; set; }
+    public string Name { get; set; }
+}
+```
+
+```razor
+@using YourAssembly.Views.Components;
+@model AvatarComponent
+
+<div class="avatar">
+    <img src="@Model.ImageUrl" alt="@Model.Name" />
+    <span>@Model.Name</span>
+</div>
+```
+
+```razor
+<!-- In a Razor Page -->
+<avatar-component image-url="/img/photo.jpg" name="Jane" />
+```
+
+## Constructors
+
+### `StaticNode()`
+
+Creates the tag helper with a **default Razor view route** derived from the class's full namespace, following the same convention as `StaticComponent`.
+
+For example, `YourAssembly.Views.Components.AvatarComponent` resolves to `~/Views/Components/AvatarComponent.cshtml`.
+
+### `StaticNode(string razorViewRoute)`
+
+Creates the tag helper with a **custom Razor view route**, overriding the default convention.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `razorViewRoute` | `string` | The explicit path to the Razor partial view. |
+
+## Public Properties
+
+### `ViewContext`
+
+```csharp
+[HtmlAttributeNotBound]
+[ViewContext]
+public ViewContext? ViewContext { protected get; set; }
+```
+
+The View Context injected by ASP.NET Core at runtime. Provides access to the HTTP context and the HTML helper used to render partial views. This property should not be set manually.
+
+## Protected Methods
+
+### `GetHtmlHelper()`
+
+```csharp
+protected IHtmlHelper GetHtmlHelper()
+```
+
+Retrieves the `IHtmlHelper` from the current `ViewContext`. Used internally for rendering partial views. Throws `ArgumentNullException` if `ViewContext` is `null`.
+
+### `RenderPartialView(TagHelperOutput output)`
+
+```csharp
+protected async Task RenderPartialView(TagHelperOutput output)
+```
+
+Renders the partial view using the default Razor view route and sends `this` (the component instance) as the model.
+
+### `RenderPartialView(string viewRoute, TagHelperOutput output)`
+
+```csharp
+protected async Task RenderPartialView(string viewRoute, TagHelperOutput output)
+```
+
+Renders a partial view at the specified route, sending `this` as the model.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `viewRoute` | `string` | Path to the Razor partial view. |
+| `output` | `TagHelperOutput` | The tag helper output to write into. |
+
+### `RenderPartialView<T>(string viewRoute, TagHelperOutput output, T model)`
+
+```csharp
+protected async Task RenderPartialView<T>(string viewRoute, TagHelperOutput output, T model)
+```
+
+Renders a partial view at the specified route with a **custom model** instead of the component itself.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `viewRoute` | `string` | Path to the Razor partial view. |
+| `output` | `TagHelperOutput` | The tag helper output to write into. |
+| `model` | `T` | The model to pass to the partial view. |
+
+## StaticNode vs StaticComponent
+
+| Feature | StaticComponent | StaticNode |
+|---|---|---|
+| Razor partial view | Yes | Yes |
+| Self as view model | Yes | Yes |
+| Child content (`ChildContent`) | Yes | No |
+| Named slots (`RenderSlot`) | Yes | No |
+| Component nesting stack | Yes | No |
+
+<Aside type="tip">
+Choose `StaticNode` when your component only needs properties and a template. If you later need child content or slots, switch the base class to `StaticComponent`.
+</Aside>

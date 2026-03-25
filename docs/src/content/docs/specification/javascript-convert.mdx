@@ -1,0 +1,110 @@
+---
+title: 'JavascriptConvert'
+description: 'API reference for the JavascriptConvert static utility class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Static Class" variant="tip" />
+
+`JavascriptConvert` is a static utility class that serializes C# objects into **JavaScript Object Literals** instead of JSON strings. This is useful when embedding server-side state directly into `<script>` blocks, where a JavaScript object literal (without quoted property names) is more natural than a JSON string.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## Static Methods
+
+### `SerializeObject`
+
+```csharp
+public static IHtmlContent SerializeObject(
+    object value,
+    bool useSingleQuotesOnStringValues = false
+)
+```
+
+Serializes any CLR object into a JavaScript Object Literal. Property names are **camelCased** automatically (using Newtonsoft.Json's `CamelCasePropertyNamesContractResolver`) and are **not quoted**, making the output valid JavaScript rather than JSON.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `value` | `object` | — | The object to serialize. |
+| `useSingleQuotesOnStringValues` | `bool` | `false` | When `true`, string values use single quotes (`'`) instead of double quotes (`"`). Useful when the output is placed inside an HTML attribute. |
+
+**Returns:** `IHtmlContent` — the serialized object literal, safe for use in Razor views.
+
+## Usage
+
+### In a script block
+
+```csharp
+public class ChartComponent : StaticComponent
+{
+    public ChartOptions Options { get; set; } = new();
+}
+
+public class ChartOptions
+{
+    public string Title { get; set; } = "Sales";
+    public int MaxValue { get; set; } = 100;
+    public bool ShowLegend { get; set; } = true;
+}
+```
+
+```razor
+@using TechGems.StaticComponents;
+@model ChartComponent
+
+<div id="chart"></div>
+
+<script static-script>
+    var options = @JavascriptConvert.SerializeObject(Model.Options);
+    initChart(options);
+</script>
+```
+
+**Output:**
+
+```html
+<script>
+    var options = {title: "Sales", maxValue: 100, showLegend: true};
+    initChart(options);
+</script>
+```
+
+### In an HTML attribute (single quotes)
+
+When embedding the object inside an HTML attribute (common with AlpineJS `x-data`), use single quotes to avoid breaking the attribute syntax:
+
+```razor
+<div x-data="@JavascriptConvert.SerializeObject(Model.Options, useSingleQuotesOnStringValues: true)">
+    ...
+</div>
+```
+
+**Output:**
+
+```html
+<div x-data="{title: 'Sales', maxValue: 100, showLegend: true}">
+    ...
+</div>
+```
+
+<Aside type="caution">
+Avoid serializing user-generated strings directly with `JavascriptConvert`. Since the output is rendered as raw JavaScript (not JSON), unsanitized user input could introduce **XSS vulnerabilities**. Only use this with trusted, server-controlled data.
+</Aside>
+
+## JSON vs JavaScript Object Literal
+
+| Feature | JSON | JavaScript Object Literal |
+|---|---|---|
+| Property names | `"quoted"` | `unquoted` |
+| Directly assignable in JS | No (needs `JSON.parse()`) | Yes |
+| Valid in `x-data` attributes | Awkward (double-quote conflicts) | Clean with single-quote mode |
+
+## Related
+
+- [JavaScript Object Serialization](/features/javascript-object-serialization) — Feature guide with detailed examples
+- [Integrating AlpineJS](/advanced-usage/alpine) — Using `JavascriptConvert` with AlpineJS `x-data`

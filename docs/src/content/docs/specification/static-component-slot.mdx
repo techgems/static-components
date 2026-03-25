@@ -1,0 +1,97 @@
+---
+title: 'StaticComponentSlot'
+description: 'API reference for the StaticComponentSlot class (the <slot> tag helper).'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: StaticComponent" variant="note" /> <Badge text="HTML Target: &lt;slot&gt;" variant="success" />
+
+`StaticComponentSlot` is the tag helper that powers the `<slot>` element. It captures named content blocks and registers them with the nearest parent `StaticComponent`, enabling flexible UI composition through named slots.
+
+This class is used **declaratively** — you do not need to instantiate or inherit from it. Simply use the `<slot>` tag inside any component that extends `StaticComponent`.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## HTML Target Element
+
+```html
+<slot name="slotName">
+    <!-- Slot content here -->
+</slot>
+```
+
+## Usage
+
+Slots are declared inside a parent component's tag and rendered in the parent's Razor template via `RenderSlot`:
+
+```razor
+<!-- Declaring slots in a page -->
+<card-component>
+    <slot name="header">
+        <h2>Card Title</h2>
+    </slot>
+    <slot name="footer">
+        <button>Action</button>
+    </slot>
+</card-component>
+```
+
+```razor
+<!-- Rendering slots in the component's Razor view -->
+@model CardComponent
+
+<div class="card">
+    <div class="card-header">@Model.RenderSlot("header")</div>
+    <div class="card-footer">@Model.RenderSlot("footer")</div>
+</div>
+```
+
+## Public Properties
+
+### `Name`
+
+```csharp
+[HtmlAttributeName("name")]
+public string Name { get; set; }
+```
+
+The name of the slot. This value is used as the dictionary key when registering the slot content with the parent component. It must be **unique** within a single parent component and **cannot be empty**.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `name` |
+| Required | Yes |
+| Default | `""` (empty string — will throw at runtime) |
+
+## Behavior
+
+When processed, `StaticComponentSlot`:
+
+1. **Validates** that `Name` is not null or empty — throws `ArgumentException` otherwise.
+2. **Validates** that a parent `StaticComponent` exists — throws `ArgumentNullException` if there is no parent.
+3. **Captures** the inner HTML content of the `<slot>` tag.
+4. **Registers** the content in the parent component's `NamedSlots` dictionary using `Name` as the key.
+5. **Suppresses output** — the `<slot>` tag itself does not render any HTML. The content is only rendered when `RenderSlot` is called in the parent's Razor view.
+
+<Aside type="caution">
+Slot names must be unique within a single parent component. Using the same slot name twice will throw an `ArgumentException` at runtime.
+</Aside>
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| `Name` is null or empty | `ArgumentException` |
+| No parent `StaticComponent` found | `ArgumentNullException` |
+| Slot content is null | `ArgumentNullException` |
+| Duplicate slot name in the same parent | `ArgumentException` |
+
+## Related
+
+- [Child Content and Slots](/features/child-content-and-slots) — Feature guide with detailed examples
+- [StaticComponent](/spec/static-component) — The base class that hosts named slots

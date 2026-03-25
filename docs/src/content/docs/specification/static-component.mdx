@@ -1,0 +1,187 @@
+---
+title: 'StaticComponent'
+description: 'API reference for the StaticComponent abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: TagHelper" variant="note" />
+
+`StaticComponent` is the core abstract base class for building component-driven UIs in ASP.NET Core. It extends `TagHelper` and uses a Razor partial view as its template, sending itself as the view model. It supports **child content** and **named slots** for flexible UI composition.
+
+## Namespace
+
+```
+TechGems.StaticComponents
+```
+
+## Usage
+
+To create a component, inherit from `StaticComponent` and create a matching `.cshtml` Razor view:
+
+```csharp
+using TechGems.StaticComponents;
+
+namespace YourAssembly.Views.Components;
+
+public class AlertComponent : StaticComponent
+{
+    public string Type { get; set; } = "info";
+}
+```
+
+```razor
+@using YourAssembly.Views.Components;
+@model AlertComponent
+
+<div class="alert alert-@Model.Type">
+    @Model.ChildContent
+</div>
+```
+
+## Constructors
+
+### `StaticComponent()`
+
+Creates the tag helper with a **default Razor view route** derived automatically from the class's full namespace. The convention maps the namespace path to a file path, replacing the assembly name with `~` and dots with `/`, appending `.cshtml`.
+
+For example, `YourAssembly.Views.Components.AlertComponent` resolves to `~/Views/Components/AlertComponent.cshtml`.
+
+### `StaticComponent(string razorViewRoute)`
+
+Creates the tag helper with a **custom Razor view route**, overriding the default convention.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `razorViewRoute` | `string` | The explicit path to the Razor partial view. |
+
+## Public Properties
+
+### `ViewContext`
+
+```csharp
+[HtmlAttributeNotBound]
+[ViewContext]
+public ViewContext? ViewContext { protected get; set; }
+```
+
+The View Context injected by ASP.NET Core at runtime. Provides access to the HTTP context and the HTML helper used to render partial views. This property should not be set manually.
+
+### `ChildContent`
+
+```csharp
+[HtmlAttributeNotBound]
+public TagHelperContent? ChildContent { get; set; }
+```
+
+Holds the inner HTML content placed between the component's opening and closing tags. Access this in your Razor template via `@Model.ChildContent`.
+
+### `IsChildContentNullOrEmpty`
+
+```csharp
+[HtmlAttributeNotBound]
+public bool IsChildContentNullOrEmpty { get; }
+```
+
+Returns `true` if `ChildContent` is `null` or contains only whitespace. Useful for rendering fallback content in your Razor template.
+
+## Public Methods
+
+### `RenderSlot(string name)`
+
+```csharp
+public TagHelperContent RenderSlot(string name)
+```
+
+Renders the content of a named slot in the Razor template. Throws `ArgumentException` if the slot name does not exist.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `string` | The name of the slot to render. |
+
+**Returns:** `TagHelperContent` — the HTML content captured in the slot.
+
+### `IsSlotContentNullOrEmpty(string slotName)`
+
+```csharp
+public bool IsSlotContentNullOrEmpty(string slotName)
+```
+
+Checks whether a named slot was provided and contains content. Returns `true` if the slot is missing, `null`, or whitespace-only. Useful for slot fallback logic.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `slotName` | `string` | The name of the slot to check. |
+
+**Returns:** `bool`
+
+## Protected Properties
+
+### `ParentComponent`
+
+```csharp
+[HtmlAttributeNotBound]
+protected StaticComponent? ParentComponent { get; set; }
+```
+
+A reference to the parent `StaticComponent` in the component hierarchy. Set automatically during the tag helper lifecycle via `Init`. This is `null` for top-level components.
+
+## Protected Methods
+
+### `GetHtmlHelper()`
+
+```csharp
+protected IHtmlHelper GetHtmlHelper()
+```
+
+Retrieves the `IHtmlHelper` from the current `ViewContext`. Used internally for rendering partial views. Throws `ArgumentNullException` if `ViewContext` is `null`.
+
+### `RenderPartialView(TagHelperOutput output)`
+
+```csharp
+protected async Task RenderPartialView(TagHelperOutput output)
+```
+
+Renders the partial view using the default Razor view route and sends `this` (the component instance) as the model.
+
+### `RenderPartialView(string viewRoute, TagHelperOutput output)`
+
+```csharp
+protected async Task RenderPartialView(string viewRoute, TagHelperOutput output)
+```
+
+Renders a partial view at the specified route, sending `this` as the model.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `viewRoute` | `string` | Path to the Razor partial view. |
+| `output` | `TagHelperOutput` | The tag helper output to write into. |
+
+### `RenderPartialView<T>(string viewRoute, TagHelperOutput output, T model)`
+
+```csharp
+protected async Task RenderPartialView<T>(string viewRoute, TagHelperOutput output, T model)
+```
+
+Renders a partial view at the specified route with a **custom model** instead of the component itself.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `viewRoute` | `string` | Path to the Razor partial view. |
+| `output` | `TagHelperOutput` | The tag helper output to write into. |
+| `model` | `T` | The model to pass to the partial view. |
+
+<Aside type="tip">
+Use the generic `RenderPartialView<T>` override when you need to render a partial view with a different model type. This is an advanced scenario covered in the [Override Default Rendering](/advanced-usage/override-rendering) guide.
+</Aside>
+
+## View Route Convention
+
+By default, the Razor view route is derived from the component's full type name:
+
+```
+{AssemblyName}.Views.Components.AlertComponent
+→ ~/Views/Components/AlertComponent.cshtml
+```
+
+The assembly name is replaced with `~`, and dots are replaced with `/`. If this convention doesn't fit your project structure, use the constructor overload that accepts a custom `razorViewRoute`.

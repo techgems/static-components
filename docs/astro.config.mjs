@@ -61,6 +61,17 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'Specification',
+					items: [
+						{ label: 'StaticComponent', slug: 'specification/static-component' },
+						{ label: 'StaticNode', slug: 'specification/static-node' },
+						{ label: 'StaticComponentSlot', slug: 'specification/static-component-slot' },
+						{ label: 'StaticScript', slug: 'specification/static-script' },
+						{ label: 'StaticScriptRenderer', slug: 'specification/static-script-renderer' },
+						{ label: 'JavascriptConvert', slug: 'specification/javascript-convert' },
+					]
+				},
+				{
 					label: 'Miscellaneous',
 					items: [
 						{ label: 'AI Usage', slug: 'miscellaneous/using-ai' }
