@@ -61,14 +61,14 @@ export default defineConfig({
 					]
 				},
 				{
-					label: 'Specification',
+					label: 'Reference',
 					items: [
-						{ label: 'StaticComponent', slug: 'specification/static-component' },
-						{ label: 'StaticNode', slug: 'specification/static-node' },
-						{ label: 'StaticComponentSlot', slug: 'specification/static-component-slot' },
-						{ label: 'StaticScript', slug: 'specification/static-script' },
-						{ label: 'StaticScriptRenderer', slug: 'specification/static-script-renderer' },
-						{ label: 'JavascriptConvert', slug: 'specification/javascript-convert' },
+						{ label: 'StaticComponent', slug: 'reference/static-component' },
+						{ label: 'StaticNode', slug: 'reference/static-node' },
+						{ label: 'StaticComponentSlot', slug: 'reference/static-component-slot' },
+						{ label: 'StaticScript', slug: 'reference/static-script' },
+						{ label: 'StaticScriptRenderer', slug: 'reference/static-script-renderer' },
+						{ label: 'JavascriptConvert', slug: 'reference/javascript-convert' },
 					]
 				},
 				{
