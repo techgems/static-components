@@ -39,7 +39,8 @@ export default defineConfig({
 						{ label: 'Installation', slug: 'introduction/installation' },
 						{ label: 'Basic Usage', slug: 'introduction/basic-usage' },
 						{ label: 'HATS Stack', slug: 'introduction/hats-stack' },
-						{ label: 'Comparisons', slug: 'introduction/comparisons' }
+						{ label: 'Comparisons', slug: 'introduction/comparisons' },
+						{ label: 'Examples', slug: 'introduction/examples' }
 					],
 				},
 				{

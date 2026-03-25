@@ -4,7 +4,9 @@
       "Bash(xargs grep -l \"StaticScript\\\\|TestClass\\\\|Test\")",
       "Bash(grep -n \"WriteTo\\\\|Render\\\\|IHtmlContent\" /c/Users/Carlos/Desktop/\"Professional Projects\"/static-components/src/StaticComponents/*.cs)",
       "Bash(dotnet build TechGems.StaticComponents.UnitTests/TechGems.StaticComponents.UnitTests.csproj)",
-      "Bash(dotnet test TechGems.StaticComponents.UnitTests/TechGems.StaticComponents.UnitTests.csproj --verbosity normal)"
+      "Bash(dotnet test TechGems.StaticComponents.UnitTests/TechGems.StaticComponents.UnitTests.csproj --verbosity normal)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)"
     ]
   }
 }
