@@ -4,15 +4,14 @@
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
     <Authors>Carlos Jimenez</Authors>
     <Product>Static Components</Product>
-    <Description>Static Components is a simple, minimalistic library that lets you write tag helpers as Razor powered static components. Great to use when you want better UI composition but you just want to use MVC or Razor Pages.</Description>
+    <Description>Build component-driven UIs in ASP.NET Core without leaving Razor Pages — no JavaScript framework required.</Description>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/techgems/static-components</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>components;mvc;razor-pages;tag-helpers;static-components</PackageTags>
-    <FileVersion>1.1.1</FileVersion>
+    <PackageTags>razor;mvc;razor-pages;tag-helpers;static-components;ui;alpinejs;components;htmx;asp.net-core;tag-helpers;</PackageTags>
     <PackageId>TechGems.StaticComponents</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>  
@@ -24,6 +23,10 @@
 
   <ItemGroup>
 	<None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<InternalsVisibleTo Include="TechGems.StaticComponents.UnitTests" />
   </ItemGroup>
 
   <ItemGroup>

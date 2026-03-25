@@ -8,7 +8,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Static Components',
-			description: "Static Components is an ASP.NET Core library that allows you to create modern UI reusable elements with Razor Pages.",
+			description: "Build component-driven UIs in ASP.NET Core without leaving Razor Pages — no JavaScript framework required.",
 			logo: {
 				src: "./src/assets/logo.svg",
 				replacesTitle: true
@@ -47,6 +47,7 @@ export default defineConfig({
 					label: 'Features',
 					items: [
 						{ label: 'Child Content and Slots', slug: 'features/child-content-and-slots' },
+						{ label: 'Leaf Nodes', slug: 'features/leaf-nodes' },
 						{ label: 'Static Scripts', slug: 'features/static-scripts' },
 						{ label: 'JavaScript Object Serialization', slug: 'features/javascript-object-serialization' }
 					]

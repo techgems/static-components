@@ -39,7 +39,7 @@ public abstract class StaticNode : TagHelper
     /// </summary>
     [HtmlAttributeNotBound]
     [ViewContext]
-    public ViewContext? ViewContext { get; set; }
+    public ViewContext? ViewContext { protected get; set; }
 
     /// <summary>
     /// Gets the Html Helper from the View Context. Used for rendering partial views.

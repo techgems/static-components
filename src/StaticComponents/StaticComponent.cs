@@ -40,11 +40,12 @@ public abstract class StaticComponent : TagHelper
     }
 
     /// <summary>
-    /// The View Context necessary to get the Html Helper that renders the partial views.
+    /// The View Context necessary to get the Html Helper that renders the partial views. 
+    /// It is marked with a public get so ASP.NET Core can set its value during runtime, but its value should not be modified manually.
     /// </summary>
     [HtmlAttributeNotBound]
     [ViewContext]
-    public ViewContext? ViewContext { get; set; }
+    public ViewContext? ViewContext { protected get; set; }
 
     /// <summary>
     /// Child content for rendering in the razor template.

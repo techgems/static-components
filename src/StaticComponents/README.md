@@ -5,9 +5,9 @@ Create ⚡️ Static ASP.NET Core Server Components ⚡️
 
 ---
 
-Static Components is an extension to ASP.NET Core MVC and Razor Pages. It takes the concept of a tag helper and supercharges it to make it simple to write static server components. It has no dependencies and it is very lightweight, being composed of only 2 files.
+Static Components is an extension to ASP.NET Core MVC and Razor Pages. It takes the concept of a tag helper and supercharges it to make it simple to write static server components.
 
-Static Components may be small, but don't let that hide it's potential. It is the perfect tool for organizing your UI into decoupled reusable components, complementing HTMX workflows and even writing low-JS component libraries with tools such as [AlpineJS](https://alpinejs.dev/) or [Stimulus JS](https://stimulus.hotwired.dev/).
+Static Components is the perfect tool for organizing your UI into decoupled reusable components, complementing HTMX and low-JS tools like [AlpineJS](https://alpinejs.dev/).
 
 ## Documentation
 
