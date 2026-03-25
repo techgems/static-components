@@ -52,7 +52,7 @@ Move the script to the location of `<render-static-scripts />` (typically near t
 Ensure the script renders only a single time, even if the component appears multiple times on the page:
 
 ```razor
-<script static-script render-once="@(new MyComponent())">
+<script static-script render-once="@Model">
     console.log("Only rendered once");
 </script>
 ```
@@ -62,7 +62,7 @@ Ensure the script renders only a single time, even if the component appears mult
 Teleport **and** render once:
 
 ```razor
-<script static-script teleport-script render-once="@(new MyComponent())">
+<script static-script teleport-script render-once="@Model">
     // Teleported to the bottom and only rendered once
 </script>
 ```

@@ -1,0 +1,53 @@
+---
+title: 'Overview'
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Static Components is a minimalistic ASP.NET Core library that allows you to write UI components while maintaining full compatibility with Razor Pages and MVC. With this library you can create your own static components, which makes it synergize perfectly with AlpineJS, HTMX, and the "low-JS" approach to building web applications.
+
+<CardGrid>
+  <Card title="Component-driven" icon="puzzle">
+    Build reusable UI components using familiar Razor syntax — no JavaScript framework required.
+  </Card>
+  <Card title="Razor-native" icon="document">
+    Works seamlessly with Razor Pages and MVC. Your components are tag helpers under the hood.
+  </Card>
+  <Card title="Composable" icon="layers">
+    Support for child content, named slots, and nested component hierarchies.
+  </Card>
+  <Card title="Script management" icon="setting">
+    Built-in tools for teleporting scripts, deduplicating them, and injecting server-side state.
+  </Card>
+</CardGrid>
+
+## How it works
+
+A component consists of two files: a C# code-behind class that inherits from `StaticComponent`, and a Razor view (`.cshtml`) that serves as its template. The class is automatically available as a tag helper in your Razor pages.
+
+```csharp
+// ~/Pages/Components/HelloWorldComponent.cshtml.cs
+
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using TechGems.StaticComponents;
+
+namespace Sample.Views.Components;
+
+public class HelloWorldComponent : StaticComponent
+{
+    public HelloWorldComponent()
+    {
+    }
+
+    public string GreetMessage { get; set; }
+}
+```
+
+```razor
+<!-- ~/Pages/Components/HelloWorldComponent.cshtml -->
+
+@using Sample.Views.Components;
+@model HelloWorldComponent
+
+<div>Hello world! @Model.GreetMessage</div>
+```

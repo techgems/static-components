@@ -2,9 +2,15 @@
 title: 'Leaf Nodes'
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 Leaf nodes are an implementation of a Static Component that doesn't allow the use of Child Content or Slots. This is useful to avoid clutter and to make developer intent clear when authoring a Static Component. Other than this they behave in the same way that Static Components do.
 
-Leaf nodes use the `StaticNode` as a base class instead of `StaticComponent`. 
+Leaf nodes use the `StaticNode` as a base class instead of `StaticComponent`.
+
+<Aside type="tip">
+Use `StaticNode` when your component is self-contained and doesn't need to wrap any inner HTML. This makes the component's API clearer to consumers — they know at a glance that no child content is expected.
+</Aside>
 
 They can be implemented like this:
 
@@ -20,7 +26,7 @@ public class HelloWorldComponent : StaticNode
 }
 ```
 
-```razor 
+```razor
 <!-- ~/Pages/Components/HelloWorldComponent.cshtml -->
 
 @using Sample.Views.Components;
@@ -28,5 +34,3 @@ public class HelloWorldComponent : StaticNode
 
 <div>Hello world! @Model.GreetMessage</div>
 ```
-
-

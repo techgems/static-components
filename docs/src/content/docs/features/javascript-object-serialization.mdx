@@ -2,6 +2,8 @@
 title: JavaScript Object Serialization
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ## How to properly inject Server-Side values into a script
 
 Injecting server-side state into your JavaScript is both a great way to add additional flexibility to your applications and a great way to create messy code. From version onwards 1.1.0, Static Components contains additional functionality to streamline the process of adding server-side values into your JS code.
@@ -67,7 +69,9 @@ public class PinesBanner : StaticComponent
 
 Static Components contains the helper function `JavascriptConvert.SerializeObject()`, which will serialize any C# object into [JS Object Literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects#using_object_initializers). JSON serialization is possible, but insufficient when writing scripts, since it is not immediately compatible with JS unless you call `JSON.parse()`. `JavascriptConvert.SerializeObject()` exists in order to skip that step and add better ergonomics when mixing C# server side values into a script that will render on the client.
 
-The following table is to show the different ways in which `JavascriptConvert.SerializeObject()` can be called and what the output is. For this we will assume the following C# class:
+## Serialization output reference
+
+The following table shows the different ways in which `JavascriptConvert.SerializeObject()` can be called and what the output is. For this we will assume the following C# class:
 
 ```csharp
 
@@ -95,11 +99,15 @@ var value = new SampleClass() {
 
 | Function Call | Result | Use Case |
 |:---|:---|:---|
-| SerializeObject(value) | `{ booleanValue: true, numberValue: 500, stringValue: "Test String", stringArray: ["One", "Two"] }` | Use this outside of HTML Attributes, where double quotes do not disrupt your markup. | 
+| SerializeObject(value) | `{ booleanValue: true, numberValue: 500, stringValue: "Test String", stringArray: ["One", "Two"] }` | Use this outside of HTML Attributes, where double quotes do not disrupt your markup. |
 | SerializeObject(value, true) | `{ booleanValue: true, numberValue: 500, stringValue: 'Test String', stringArray: ['One', 'Two'] }` | Use this inside of HTML Attributes or in any place in which single quotes are preferrable for serializing string values. |
 
-One important thing to consider is that Static Components uses [Newtonsoft.Json](https://www.newtonsoft.com/json) internally to serialize your CLR objects into JS objects, if you want to customize the way that the serialization happens, you will need to use Newtonsoft.Json attributes, not `System.Text.Json` attributes, as those will be ignored.
+<Aside type="note">
+Static Components uses [Newtonsoft.Json](https://www.newtonsoft.com/json) internally to serialize your CLR objects into JS objects. If you want to customize the way that the serialization happens, you will need to use Newtonsoft.Json attributes, not `System.Text.Json` attributes, as those will be ignored.
+</Aside>
 
 ## Security
 
-**Be careful**  when injecting **user-supplied** or **untrusted** values. If a server-side value could contains special characters, code or HTML that you didn't write, make sure it is properly encoded before embedding it in a JavaScript Object Literal to avoid XSS attacks and other vulnerabilities.
+<Aside type="danger">
+**Be careful** when injecting **user-supplied** or **untrusted** values. If a server-side value could contain special characters, code or HTML that you didn't write, make sure it is properly encoded before embedding it in a JavaScript Object Literal to avoid XSS attacks and other vulnerabilities.
+</Aside>

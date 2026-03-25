@@ -2,15 +2,19 @@
 title: 'Static Scripts'
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 Static Components gives you a set of tools to do more with scripts than ASP.NET Core allows you. Static Components are essentially compiler enhanced versions of Razor Partials. Normally partials cannot use Razor sections, which is why using scripts in partials is normally discouraged.
 
 The `static-script` tag helper was created to alleviate that problem. It allows you to "teleport" a script so that it is not rendered inline. It allows you to tell a component when a script inside a static component should only be rendered once. This gives you a lot of flexibility when it comes to adding javascript to your static components, particularly by keeping related code in the same place. Static scripts should work both when used inside Static Components as well as regular partial views or ViewComponents.
 
 The `static-script` tag helper on it's own does nothing though, but by including it allows you to use the following properties on a regular `<script>` tag.
 
-- `render-once`
-- `teleport-script`
-- `disable-render`
+| Attribute | Type | Description |
+|---|---|---|
+| `render-once` | `object` | Deduplicates the script — renders it only once per page, keyed by the model's type. |
+| `teleport-script` | `bool` | Moves the script to the `<render-static-scripts />` location instead of rendering inline. |
+| `disable-render` | `bool` | Suppresses the script entirely when `true`. |
 
 We will cover these properties shortly, but this would be an example of what a `static-script` looks like:
 
@@ -73,7 +77,7 @@ Using a regular script, this would have resulted in the script being rendered tw
 
 ```html
 <input name="MobilePhoneNumber" />
-<script type="text/javascript" defer> 
+<script type="text/javascript" defer>
     var selector = document.querySelector("[data-mask]");
 
     var im = new Inputmask("(000)-000-0000");
@@ -82,9 +86,11 @@ Using a regular script, this would have resulted in the script being rendered tw
 <input name="HomePhoneNumber" />
 ```
 
-Thus not resulting in script duplication, reducing JavaScript runtime errors and leading to a more intuitive code structure. 
+Thus not resulting in script duplication, reducing JavaScript runtime errors and leading to a more intuitive code structure.
 
-One thing you might have noticed is that it's not a great practice to have scripts in the middle of your HTML, since they can get executed before you want them to be executed, you can use the defer attribute for that, but in the next section we will cover a different solution for that same purpose.
+<Aside type="note">
+Notice that having scripts in the middle of your HTML isn't ideal — they can get executed before the DOM is ready. You can use the `defer` attribute for that, but in the next section we will cover `teleport-script` as a more robust solution.
+</Aside>
 
 ## `teleport-script`
 
@@ -121,6 +127,10 @@ We can do this the following way:
 </html>
 ```
 
+<Aside type="tip">
+The `<render-static-scripts />` tag helper is a self-closing element included with Static Components. Place it in your layout — typically right before the closing `</body>` tag — and all teleported scripts will render there.
+</Aside>
+
 Static Components includes a custom-built static component called `render-static-scripts` which renders all scripts that are meant to be teleported.
 
 The final HTML output would then be something like this:
@@ -149,7 +159,8 @@ The teleported script in this example gets rendered only once due to the `render
 
 ## `disable-render`
 
-Disable render is a boolean attribute meant to stop the script from rendering at all. This can be useful if you want to prevent the script from rendering for any reason. 
+Disable render is a boolean attribute meant to stop the script from rendering at all. This can be useful if you want to prevent the script from rendering for any reason.
 
+<Aside type="caution">
 A potential use case might be not rendering a script when a static component is being used in an AJAX or HTMX request, at which point you can send custom headers in the request and read them in the view itself to set `disable-render` to true.
-
+</Aside>

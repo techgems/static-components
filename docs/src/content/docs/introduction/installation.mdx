@@ -1,0 +1,34 @@
+---
+title: 'Installation'
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Installing Static Components is straightforward. You need a .NET 6 or above project and a single NuGet package.
+
+<Steps>
+
+1. **Install the NuGet package**
+
+   ```
+   dotnet add package TechGems.StaticComponents --version 1.2.0
+   ```
+
+2. **Register the tag helpers**
+
+   Open your `_ViewImports.cshtml` file and add references to both your project's namespace and the Static Components library:
+
+   ```
+   @addTagHelper *, YourRazorPagesProject.Web
+   @addTagHelper *, TechGems.StaticComponents
+   ```
+
+3. **Start building components!**
+
+   You're all set. Continue to [Basic Usage](/introduction/basic-usage) to learn how to create your first component.
+
+</Steps>
+
+<Aside type="tip">
+The first `@addTagHelper` line registers your own project's tag helpers (your components). The second line registers the built-in tag helpers from Static Components, such as `<slot>`, `<render-static-scripts />`, and `static-script`.
+</Aside>

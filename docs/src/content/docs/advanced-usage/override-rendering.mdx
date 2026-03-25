@@ -2,11 +2,17 @@
 title: 'Advanced Usage'
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ## Overriding ProcessAsync
 
 As you may be aware, the method `ProcessAsync` is an essential part for implementing the functionality of a StaticComponent, which is ultimately just a fancy [tag helper](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro?view=aspnetcore-10.0).
 
 If all you need to do is render a partial view as part of the functionality of your tag helper, then you are fine using the default implementation included in `StaticComponent`. However, if for some reason you need to do more with your tag helper, then you can override the default implementation.
+
+<Aside type="caution">
+Overriding `ProcessAsync` will cause the default partial view rendering to **not happen**. You must call one of the `RenderPartialView` helper methods yourself if you still want the Razor template to render.
+</Aside>
 
 Doing this will cause the rendering of the corresponding partial view to not happen, however, there are a couple of helper functions included in the base class that you can use to do render the partial view. It would look something like this:
 
@@ -34,10 +40,14 @@ public class HelloWorldComponent : StaticComponent
 
 The one thing that is worthy of note is that the implementation of `RenderPartialView` method does use the output and sets a couple of things for partial view rendering to work, specifically:
 
-- output.Content: Which is set as the output of the partial view.
-- output.TagName: Which is set to null.
+| Property | Set to | Purpose |
+|---|---|---|
+| `output.Content` | The rendered partial view HTML | The actual component output. |
+| `output.TagName` | `null` | Removes the wrapper tag so only the partial's HTML is emitted. |
 
 If you need to avoid using `RenderPartialView` altogether, you can by using the HtmlHelper method inside the base class directly by calling inside your implementation of `ProcessAsync`. That said `RenderPartialView` will fit 99% of use cases.
+
+### Conditional rendering with an alternate view
 
 ```csharp
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -53,17 +63,17 @@ public class HelloWorldComponent : StaticComponent
     }
 
     [HtmlAttributeName("render-alternate")]
-    public bool RenderAlternateView { get; set; }       
+    public bool RenderAlternateView { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         //Your custom logic here...
 
-        if(!RenderAlternateView) 
+        if(!RenderAlternateView)
         {
             await base.RenderPartialView(output);
         }
-        else 
+        else
         {
             var model = new ModelType() {
                 Name = "Test",
@@ -76,4 +86,6 @@ public class HelloWorldComponent : StaticComponent
 }
 ```
 
-By overriding the default `ProcessAsync` you can take complete control of the way razor gets processed and how the output gets handled. Something to note is that to do this properly you require proper knowledge of how to write your own [Tag Helpers](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro?view=aspnetcore-10.0) in ASP.NET Core.
+<Aside type="note">
+To override `ProcessAsync` properly you require knowledge of how to write your own [Tag Helpers](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro?view=aspnetcore-10.0) in ASP.NET Core. By overriding it you can take complete control of the way Razor gets processed and how the output gets handled.
+</Aside>

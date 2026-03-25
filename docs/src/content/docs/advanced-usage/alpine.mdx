@@ -1,7 +1,8 @@
 ---
 title: 'Static Components with AlpineJS'
---- 
+---
 
+import { Aside } from '@astrojs/starlight/components';
 
 ## Basic Client-side interactions with AlpineJS
 
@@ -44,7 +45,7 @@ And the partial view:
     <button @@click="open = !open">Toggle</button>
 </div>
 ```
-`JavascriptConvert.SerializeObject` is a utility provided by Static Components that allows you to serialize an object into a Javascript Object Literal. This is easier than having to replicate and respect that syntax using razor.  
+`JavascriptConvert.SerializeObject` is a utility provided by Static Components that allows you to serialize an object into a Javascript Object Literal. This is easier than having to replicate and respect that syntax using razor.
 
 The component can now be used this way
 
@@ -125,7 +126,7 @@ AlpineJS is a great way to create reusable components with minimal JS, but it's 
         imageGalleryPrev() {
             this.imageGalleryImageIndex = (this.imageGalleryImageIndex == 1) ? this.imageGallery.length : (parseInt(this.imageGalleryImageIndex) - 1);
             this.imageGalleryActiveUrl = this.$refs.gallery.querySelector('[data-index=\'' + this.imageGalleryImageIndex + '\']').src;
-            
+
         }
     }"
     @@image-gallery-next.window="imageGalleryNext()"
@@ -266,6 +267,10 @@ We now have a list parameter, we can use it the razor view to make the component
 
 This will work for this component, particularly since we are using `JavascriptConvert.SerializeObject(Model.ImageList, true)`, by using the second parameter as `true`, we are telling the serialization to not produce double-quotes when serializing strings, which would break the configuration in `x-data`. However, on a larger component, with more parameters and or interactions, the values in `x-data` will eventually become a large and mostly unmaintainable list. To solve that problem, AlpineJS allows us to define our own reusable data objects:
 
+<Aside type="tip">
+By using `Alpine.data()`, you can extract complex state and methods into a named, reusable function — keeping `x-data` clean and your components maintainable.
+</Aside>
+
 ```razor
 @using TechGems.PinesUI.Views.Components.PinesImageGallery;
 @using TechGems.StaticComponents;
@@ -342,7 +347,6 @@ This will work for this component, particularly since we are using `JavascriptCo
 </div>
 ```
 
-By using the `alpine:init` event and the function `Alpine.data` we can remove the limitations of having an HTML property be a large clunky javascript object and making sure we are escaping all the characters and whatnot. One thing that must be highlighted is that AlpineJS has allowed us to create a `gallery` function, which receives an array. 
+By using the `alpine:init` event and the function `Alpine.data` we can remove the limitations of having an HTML property be a large clunky javascript object and making sure we are escaping all the characters and whatnot. One thing that must be highlighted is that AlpineJS has allowed us to create a `gallery` function, which receives an array.
 
 Now `x-data` uses the value `gallery(@JavascriptConvert.SerializeObject(Model.ImageList, true))`. This is much more easy to maintain and understand than the original component was, and by using `teleport-script` and `render-once`, we don't need to worry about the script getting duplicated if this component gets used many times in application code.
-

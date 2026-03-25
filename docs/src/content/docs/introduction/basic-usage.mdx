@@ -2,15 +2,20 @@
 title: 'Basic Usage'
 ---
 
-Static Components are extensions of ASP.NET Core Tag Helpers. 
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Static Components are extensions of ASP.NET Core Tag Helpers.
 
 To build a component you will need two files:
 
-- A C# View (cshtml file)
-- A code-behind file that inherits from `StaticComponent`
+- A Razor view (`.cshtml` file) — the component's template
+- A code-behind file (`.cshtml.cs`) — a class that inherits from `StaticComponent`
 
+<Aside type="note">
 Following ASP.NET Core convention, these files must be stored inside the `Pages` or `Views` folders.
+</Aside>
 
+## Creating a component
 
 ```csharp
 // ~/Pages/Components/HelloWorldComponent.cshtml.cs
@@ -30,7 +35,7 @@ public class HelloWorldComponent : StaticComponent
 }
 ```
 
-```razor 
+```razor
 <!-- ~/Pages/Components/HelloWorldComponent.cshtml -->
 
 @using Sample.Views.Components;
@@ -48,6 +53,8 @@ You would then be able to use your component like this:
 
 <hello-world-component greet-message="Hello there!"></hello-world-component>
 ```
+
+## Customizing tag names and attributes
 
 It is possible to override the default view route, tag name and parameter name by specifying the route to the razor view of your choosing in the base constructor, like this:
 
@@ -80,7 +87,9 @@ This should in turn be called like this:
 
 ```
 
-It's important to note that your razor template will be rendered as a partial that must use the component class as it's model. It is possible to override this, but more on that can be found in [Advanced usage](/advanced-usage/override-rendering).
+<Aside type="tip">
+Your Razor template is rendered as a partial view that uses the component class as its model. It is possible to override this behavior — see [Override Default Rendering](/advanced-usage/override-rendering) for details.
+</Aside>
 
 ## Child Content
 
@@ -94,7 +103,7 @@ namespace YourAssembly.Views;
 
 public class OutlinedButton : StaticComponent
 {
-    public OutlinedButton() 
+    public OutlinedButton()
     {
     }
 }
@@ -124,4 +133,4 @@ and you'd be able to invoke it in your code like this:
 
 ### Summary
 
-These examples should cover most of use cases for this library. However, you can override default behaviour should you need to. Look into [Advanced Usage](/docs/advanced-usage/override-rendering) for more information about overriding more defaults.
+These examples should cover most use cases for this library. However, you can override default behavior should you need to. Look into [Advanced Usage](/advanced-usage/override-rendering) for more information about overriding more defaults.
