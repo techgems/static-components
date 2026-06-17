@@ -14,11 +14,14 @@ namespace TechGems.StaticComponents;
 /// </summary>
 public abstract class StaticComponent : TagHelper
 {
-    protected readonly string _razorViewRoute;
-    protected readonly string _componentStackKey = "StackKey";
+    private readonly string _razorViewRoute;
+    private readonly string _componentStackKey = "StackKey";
 
+    /// <summary>
+    /// The parent component reference. Used internally to track the parent component in the component stack. It is marked with a public get so ASP.NET Core can set its value during runtime, but its value should not be modified manually.
+    /// </summary>
     [HtmlAttributeNotBound]
-    protected StaticComponent? ParentComponent { get; set; }
+    internal StaticComponent? ParentComponent { get; set; }
 
     /// <summary>
     /// Creates the tag helper with a razor view route using default route.

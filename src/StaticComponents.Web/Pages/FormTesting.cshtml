@@ -1,0 +1,55 @@
+﻿@page
+@model StaticComponents.Web.Pages.FormTestingModel
+@{
+}
+
+<form method="post">
+    @*STRING INPUT - WORKS WELL
+    <input-static-component-test show-label="true" asp-for="@Model.TestStringValue" />
+    <input asp-for="@Model.TestStringValue" />
+    *@
+
+
+    @*CHECKBOX -- WORKS WELL
+    <input-static-checkbox-test show-label="true" asp-for="@Model.TestCheckbox" />
+    <input asp-for="@Model.TestCheckbox" />
+    *@
+
+    @*HIDDEN - WORKS WELL
+    <input-static-component-test asp-for="@Model.TestHiddenValue" />
+    <input asp-for="@Model.TestHiddenValue" />
+    *@
+
+    @*PASSWORD - WORKS WELL
+    <input-static-component-test show-label="true" asp-for="@Model.TestPasswordValue" />
+    <input asp-for="@Model.TestPasswordValue" />
+    *@
+
+    @*NUMBER INPUT - WORKS WELL
+    <input-static-component-test show-label="true" asp-for="@Model.TestNumberValue" />
+    <input asp-for="@Model.TestNumberValue" />
+    *@
+
+    @*REQUIRED INPUT - WORKS WELL
+    <input-static-component-test asp-for="@Model.TestRequiredValue" />
+    <input asp-for="@Model.TestRequiredValue" />
+    *@
+
+    @*RADIO INPUT - WORKS WELL
+    <input-static-radio-test show-label="true" value="One" asp-for="@Model.TestRadioValue" />
+    <input-static-radio-test show-label="true" value="Two" asp-for="@Model.TestRadioValue" />
+
+    <label asp-for="@Model.TestRadioValue"></label>
+    <input type="radio" asp-for="@Model.TestRadioValue" value="Three" />
+    *@
+
+    @*SELECT INPUT - WORKS WELL*@
+    <input-static-select-test show-label="true" asp-for="@Model.TestNumberValue" />
+
+    @*TEXTAREA - WORKS WELL*@
+    <input-static-text-area show-label="true" asp-for="@Model.TestStringValue" />
+
+    <button type="submit">Submit Test</button>
+
+</form>
+

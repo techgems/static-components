@@ -6,7 +6,8 @@
       "Bash(dotnet build TechGems.StaticComponents.UnitTests/TechGems.StaticComponents.UnitTests.csproj)",
       "Bash(dotnet test TechGems.StaticComponents.UnitTests/TechGems.StaticComponents.UnitTests.csproj --verbosity normal)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(find \"C:/Users/Carlos/Desktop/Professional Projects/static-components\" -name \"StaticInputTests.cs\" 2>/dev/null)"
     ]
   }
 }

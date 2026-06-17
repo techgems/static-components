@@ -1,0 +1,19 @@
+﻿@model StaticComponents.Web.Views.InputStatic.InputStaticSelectTest;
+@{
+    var items = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Option 1", Value = "1" },
+        new SelectListItem { Text = "Option 2", Value = "2" },
+        new SelectListItem { Text = "Option 3", Value = "3" }
+    };
+}
+
+
+@if (Model.ShowLabel)
+{
+    <label static-for="@Model.InputExpression" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"></label>
+}
+
+<select static-for="@Model.InputExpression" static-items="items" disabled="@(Model.Disabled ? "true" : null)" class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50">
+    <option value="0">Select One</option>
+</select>
