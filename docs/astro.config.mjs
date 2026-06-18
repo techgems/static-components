@@ -49,7 +49,8 @@ export default defineConfig({
 						{ label: 'Child Content and Slots', slug: 'features/child-content-and-slots' },
 						{ label: 'Leaf Nodes', slug: 'features/leaf-nodes' },
 						{ label: 'Static Scripts', slug: 'features/static-scripts' },
-						{ label: 'JavaScript Object Serialization', slug: 'features/javascript-object-serialization' }
+						{ label: 'JavaScript Object Serialization', slug: 'features/javascript-object-serialization' },
+						{ label: 'Headless Components', slug: 'features/headless-components' }
 					]
 				},
 				{
