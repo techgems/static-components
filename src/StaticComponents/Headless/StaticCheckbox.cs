@@ -18,7 +18,13 @@ public abstract class StaticCheckbox : StaticInputBase
     [HtmlAttributeName("value")]
     public string? Value { get; set; } = default!;
 
-    /// inheritdoc
+    /// <summary>
+    /// Checked let's you mark a value as checked regardless of the model value.
+    /// </summary>
+    [HtmlAttributeName("checked")]
+    public bool Checked { get; set; } = false;
+
+    /// <inheritdoc />
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         await base.ProcessAsync(context, output);

@@ -1,0 +1,321 @@
+---
+title: 'Headless Components'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+Headless components are abstract base classes shipped with Static Components that
+give you the scaffolding needed to build your own input, select, label and button
+components for a UI kit — without having to wire up `name`, `id`, the bound value
+and the `data-val-*` validation attributes yourself.
+
+You inherit from one of them, write your Razor template once, and end users of
+your kit can drop the component into a form with `asp-for` just like they would
+with the built-in inputs.
+
+```csharp
+public class PinesCheckbox : StaticCheckbox { }
+```
+
+```razor
+@using TechGems.PinesUI.Views.Components.PinesCheckbox
+@model PinesCheckbox
+
+<div class="flex items-center mb-4">
+    <input static-checkbox-for="@Model.InputExpression"
+           checked="@Model.Checked"
+           class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-neutral-900 focus:ring-neutral-900" />
+    <label static-for="@Model.InputExpression"
+           class="ml-2 text-sm font-medium text-gray-900"></label>
+</div>
+```
+
+```razor
+<!-- consumer view -->
+<pines-checkbox asp-for="Form.AcceptsTerms"></pines-checkbox>
+```
+
+You might have noticed that instead of `asp-for`, the inner inputs use `static-*` tag helpers. The next section explains why the `static-*` tag helpers
+exist in the first place.
+
+## Why the `static-*` tag helpers exist
+
+When you use `asp-for` on the outer custom tag (`<pines-checkbox asp-for="…">`),
+ASP.NET Core resolves the expression once and assigns the resulting
+`ModelExpression` to your `InputExpression` property. Inside the component's
+template you have to pass that `ModelExpression` to the real `<input>` so the
+input knows what to bind.
+
+But if you write `asp-for="@Model.InputExpression"` on that inner input, the
+built-in `asp-for` tag helper resolves the expression a second time. The
+property it sees is now of type `ModelExpression`, not `bool` / `string` / `int`,
+so the metadata it reads (model type, validation attributes, display name,
+required-ness) is the metadata of `ModelExpression` itself — not of the property
+the consumer originally targeted. The bound name, id and `data-val-*` attributes
+all come out wrong.
+
+The `static-for`, `static-checkbox-for` and `static-radio-for` tag helpers solve
+this by expecting a doubly-wrapped `ModelExpression`. They reach one layer
+deeper (`InputExpression.ModelExplorer.Model` is itself a `ModelExpression`),
+pick up the real property's metadata from there, and emit `name`, `id`, `value`
+and the full set of `data-val-*` attributes against the original property.
+
+<Aside type="note">
+You only need the `static-*` tag helpers inside the templates of components that
+inherit from a headless base class. Regular Razor views and pages that don't go
+through this double-binding can keep using `asp-for` as usual.
+</Aside>
+
+## Available base classes
+
+| Class | Purpose | Maps `asp-for` to |
+|---|---|---|
+| `StaticInputBase` | Root for any input-like component. Exposes `InputExpression`, `ShowLabel`, `Disabled`. | `InputExpression` |
+| `StaticInput` | Free-text / number / date / email / password / etc. inputs. | `InputExpression` |
+| `StaticCheckbox` | Checkbox inputs. Adds `Value` (the checked value) and `Checked` (an explicit override). | `InputExpression` |
+| `StaticRadio` | Radio inputs. Adds `Value` (the option this radio represents — required). | `InputExpression` |
+| `StaticSelect` | `<select>` elements. Adds `Items` mapped from `asp-items`. | `InputExpression` |
+| `StaticLabel` | Standalone `<label>` components. | `For` |
+| `StaticButton` | `<button>` components. Validates the `type` attribute (`button` / `submit` / `reset`) and exposes `Disabled`. | — |
+
+
+## Matching tag helpers
+
+You'll use one of these inside the headless component's template:
+
+| Tag helper | Target element | What it does |
+|---|---|---|
+| `static-for` | `<input>` | Sets `type` (inferred from the model property or overridden via `type="…"`), `name`, `id`, `value` and the `data-val-*` attributes. Does **not** support checkbox or radio inputs. |
+| `static-checkbox-for` | `<input>` | Always emits `type="checkbox"`, `value="true"`, a paired hidden `value="false"` so unchecked submits, and `checked` based on the bool model value. Only `bool` is allowed as the inner model type. |
+| `static-radio-for` | `<input>` | Emits `type="radio"`. Requires an explicit `value="…"` (the option the radio represents) and adds `checked` when the bound model value matches it. |
+| `static-for` | `<label>` | Sets `for` from the inner expression's name and uses the inner property's `[DisplayName]` (or its property name as a fallback) as the label text. |
+| `static-for` | `<textarea>` | Same as `static-for` on `<input>`, but only `string` is supported. |
+| `static-for` + `static-items` | `<select>` | Renders `<option>` and `<optgroup>` tags. `static-items` accepts an `IEnumerable<SelectListItem>` just like `asp-items`. Selection prefers the bound model value over each item's `Selected` flag. |
+
+All of these read the original property's `[Required]`, `[StringLength]`,
+`[Range]`, `[EmailAddress]`, `[Phone]`, `[Url]`, `[RegularExpression]` and
+`[DisplayName]` attributes and emit the matching `data-val-*` attributes — so
+unobtrusive jQuery validation (or any consumer of that contract) just works.
+
+## Building a checkbox
+
+Inherit from `StaticCheckbox`. You don't need any logic in the class — the base
+gives you `InputExpression`, `ShowLabel`, `Disabled`, `Value` and `Checked` for
+free.
+
+```csharp
+// ~/Views/Components/PinesCheckbox.cshtml.cs
+using TechGems.StaticComponents.Headless;
+
+namespace TechGems.PinesUI.Views.Components;
+
+public class PinesCheckbox : StaticCheckbox { }
+```
+
+```razor
+@* ~/Views/Components/PinesCheckbox.cshtml *@
+@using TechGems.PinesUI.Views.Components.PinesCheckbox
+@model PinesCheckbox
+
+<div class="flex items-center mb-4">
+    <input static-checkbox-for="@Model.InputExpression"
+           checked="@Model.Checked"
+           disabled="@(Model.Disabled ? "disabled" : null)"
+           class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-neutral-900 focus:ring-neutral-900" />
+
+    @if (Model.ShowLabel)
+    {
+        <label static-for="@Model.InputExpression"
+               class="ml-2 text-sm font-medium text-gray-900"></label>
+    }
+</div>
+```
+
+Consumers use it the same way they'd use a built-in checkbox:
+
+```razor
+<pines-checkbox asp-for="Form.AcceptsTerms"></pines-checkbox>
+<pines-checkbox asp-for="Form.SendNewsletter" show-label="false"></pines-checkbox>
+```
+
+The rendered HTML carries the bound `name`, the sanitized `id`, a paired hidden
+input so the form posts a value even when unchecked, and `data-val-*` from any
+validation attributes on `AcceptsTerms` / `SendNewsletter`.
+
+## Building a text input
+
+Inherit from `StaticInput`. You can pass an explicit `type` through to
+`static-for` if you want to lock the input to a specific HTML type; otherwise the
+type is inferred from the model property's CLR type and `[DataType]` attribute.
+
+```csharp
+// ~/Views/Components/PinesInput.cshtml.cs
+public class PinesInput : StaticInput { }
+```
+
+```razor
+@* ~/Views/Components/PinesInput.cshtml *@
+@model PinesInput
+
+@if (Model.ShowLabel)
+{
+    <label static-for="@Model.InputExpression"
+           class="block text-sm font-medium text-gray-900"></label>
+}
+
+<input static-for="@Model.InputExpression"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+```
+
+```razor
+<pines-input asp-for="Form.FullName"></pines-input>
+<pines-input asp-for="Form.SignupEmail"></pines-input>     @* [DataType(EmailAddress)] → type="email" *@
+<pines-input asp-for="Form.Password" type="password"></pines-input>
+```
+
+## Building a radio
+
+Radios are different from checkboxes in that one component instance represents a
+single option — so the `Value` property is mandatory and the `checked` state is
+derived by comparing it to the bound model value.
+
+```csharp
+public class PinesRadio : StaticRadio { }
+```
+
+```razor
+@model PinesRadio
+
+<label class="flex items-center gap-2">
+    <input static-radio-for="@Model.InputExpression"
+           value="@Model.Value"
+           disabled="@(Model.Disabled ? "disabled" : null)"
+           class="h-4 w-4 border-gray-300 text-neutral-900" />
+    @if (Model.ShowLabel)
+    {
+        <span class="text-sm">@Model.Value</span>
+    }
+</label>
+```
+
+```razor
+<pines-radio asp-for="Form.Plan" value="basic"></pines-radio>
+<pines-radio asp-for="Form.Plan" value="pro"></pines-radio>
+<pines-radio asp-for="Form.Plan" value="enterprise"></pines-radio>
+```
+
+## Building a select
+
+`StaticSelect` adds an `Items` property that's mapped from `asp-items` — so
+consumers pass `SelectListItem`s exactly as they would to a native `<select>`.
+
+```csharp
+public class PinesSelect : StaticSelect { }
+```
+
+```razor
+@model PinesSelect
+
+@if (Model.ShowLabel)
+{
+    <label static-for="@Model.InputExpression"
+           class="block text-sm font-medium text-gray-900"></label>
+}
+
+<select static-for="@Model.InputExpression"
+        static-items="@Model.Items"
+        disabled="@(Model.Disabled ? "disabled" : null)"
+        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+</select>
+```
+
+```razor
+<pines-select asp-for="Form.Department"
+              asp-items="@Model.DepartmentOptions"></pines-select>
+```
+
+`SelectListItem`s that share a `SelectListGroup` reference are rendered together
+inside a single `<optgroup>` at the position of the group's first occurrence —
+matching the layout the built-in `select` tag helper produces.
+
+<Aside type="tip">
+Selection priority: if the bound model value matches one of the item values, that
+item is marked `selected` and the `Selected` flags on every other item are
+ignored. Only when the model value is `null` or doesn't match any item does the
+helper fall back to honoring `SelectListItem.Selected`.
+</Aside>
+
+## Building a label
+
+A standalone `<label>` component is useful when you want kit-specific label
+styling that can sit next to any input.
+
+```csharp
+public class PinesLabel : StaticLabel { }
+```
+
+```razor
+@model PinesLabel
+
+<label static-for="@Model.For"
+       class="block text-sm font-medium text-gray-900"></label>
+```
+
+Note that `StaticLabel` exposes the bound expression as `For` instead of
+`InputExpression`, but `asp-for` on the consumer-facing tag still maps to it.
+
+```razor
+<pines-label asp-for="Form.FullName"></pines-label>
+```
+
+The label content comes from the property's `[DisplayName]` if present, otherwise
+the property name itself.
+
+## Building a button
+
+`StaticButton` inherits from `StaticComponent` (not `StaticInputBase`) since
+buttons don't bind to a model. It adds a validated `type` attribute and a
+`Disabled` flag.
+
+```csharp
+public class PinesButton : StaticButton { }
+```
+
+```razor
+@model PinesButton
+
+<button type="@Model.Type"
+        disabled="@(Model.Disabled ? "disabled" : null)"
+        class="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+    @Model.ChildContent
+</button>
+```
+
+```razor
+<pines-button type="submit">Save changes</pines-button>
+<pines-button type="button" disabled="true">Loading…</pines-button>
+```
+
+`type` only accepts `"button"`, `"submit"` or `"reset"` — any other value throws
+at render time, so typos surface immediately instead of producing broken HTML.
+
+## Validation behaviour
+
+Every input/checkbox/radio/select/textarea tag helper reads the validation
+attributes on the **inner** property (the one the consumer targeted with
+`asp-for`) and emits the corresponding `data-val-*` attributes. The set of
+attributes supported today is:
+
+| C# attribute | Emits |
+|---|---|
+| `[Required]` (and non-nullable value types) | `data-val-required` |
+| `[EmailAddress]` | `data-val-email` |
+| `[Url]` | `data-val-url` |
+| `[Phone]` | `data-val-phone` |
+| `[RegularExpression]` | `data-val-regex`, `data-val-regex-pattern` |
+| `[Range]` | `data-val-range`, `data-val-range-min`, `data-val-range-max` |
+| `[StringLength]` | `data-val-length`, `data-val-length-max`, `data-val-length-min` (when a minimum is set), `maxlength` |
+
+Whenever at least one validation attribute is present, `data-val="true"` is also
+emitted so jquery.validate.unobtrusive will pick the field up.

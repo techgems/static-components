@@ -34,6 +34,12 @@ public class StaticCheckboxTagHelper : TagHelper
     public ModelExpression InputExpression { get; set; } = default!;
 
     /// <summary>
+    /// Checked let's you mark a value as checked regardless of the model value.
+    /// </summary>
+    [HtmlAttributeName("checked")]
+    public bool Checked { get; set; } = false;
+
+    /// <summary>
     /// Due to the layering of ModelExpressions, this property provides the actual property information.
     /// </summary>
     private ModelExpression InputExpressionOneLayerDeep => (ModelExpression)InputExpression.ModelExplorer.Model;
@@ -62,7 +68,7 @@ public class StaticCheckboxTagHelper : TagHelper
 
         output.Attributes.SetAttribute("value", "true");
 
-        if (!output.Attributes.ContainsName("checked") && (bool)InputExpressionOneLayerDeep.Model)
+        if (Checked || (bool)InputExpressionOneLayerDeep.Model)
         {
             output.Attributes.SetAttribute("checked", "checked");
         }
