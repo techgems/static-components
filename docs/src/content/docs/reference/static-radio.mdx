@@ -1,0 +1,99 @@
+---
+title: 'StaticRadio'
+description: 'API reference for the StaticRadio abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticInputBase" variant="note" />
+
+`StaticRadio` is the headless base class for radio `<input>` components. Unlike
+a checkbox, each radio instance represents a single option — so the `Value`
+property is required and the `checked` state is derived by comparing it against
+the bound model value.
+
+Inside the component's Razor template, bind the inner `<input>` via the
+`static-radio-for` tag helper.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesRadio : StaticRadio { }
+```
+
+```razor
+@* ~/Views/Components/PinesRadio.cshtml *@
+@model PinesRadio
+
+<label class="flex items-center gap-2">
+    <input static-radio-for="@Model.InputExpression"
+           value="@Model.Value"
+           disabled="@(Model.Disabled ? "disabled" : null)"
+           class="…" />
+    @if (Model.ShowLabel)
+    {
+        <span>@Model.Value</span>
+    }
+</label>
+```
+
+```razor
+@* consumer view *@
+<pines-radio asp-for="Form.Plan" value="basic"></pines-radio>
+<pines-radio asp-for="Form.Plan" value="pro"></pines-radio>
+<pines-radio asp-for="Form.Plan" value="enterprise"></pines-radio>
+```
+
+## Public Properties
+
+### `Value`
+
+```csharp
+[HtmlAttributeName("value")]
+public string? Value { get; set; }
+```
+
+The option value this radio instance represents. The `static-radio-for` tag
+helper requires this to be set — it throws `ArgumentException` if `Value` is
+`null` — and uses it both as the rendered `value` attribute and as the
+comparison key for deciding whether the radio is `checked`.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `value` |
+| Required | Yes (the tag helper throws if absent) |
+| Default | `null` |
+
+## Inherited Properties
+
+- `InputExpression` (`asp-for`)
+- `ShowLabel` (`show-label`)
+- `Disabled` (`disabled`)
+
+See [`StaticInputBase`](/reference/static-input-base) for the full descriptions.
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticInputBase.ProcessAsync`.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInputBase](/reference/static-input-base)
+- [StaticRadioTagHelper](/reference/static-radio-tag-helper)

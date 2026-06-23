@@ -1,0 +1,92 @@
+---
+title: 'StaticInputBase'
+description: 'API reference for the StaticInputBase abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticComponent" variant="note" />
+
+`StaticInputBase` is the root abstract class for every headless input-like
+component (text inputs, checkboxes, radios, selects). It exposes the bound
+`ModelExpression`, plus the two switches every input needs (`ShowLabel` and
+`Disabled`).
+
+You usually don't inherit from `StaticInputBase` directly — pick the more
+specific `StaticInput`, `StaticCheckbox`, `StaticRadio` or `StaticSelect` for
+the element you're building.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public abstract class MyInputBase : StaticInputBase { }
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("asp-for")]
+public ModelExpression? InputExpression { get; set; }
+```
+
+The `ModelExpression` resolved from the consumer-facing `asp-for` attribute. In
+the component's Razor template you pass this to the inner element via a
+`static-*` tag helper so the original property metadata can be recovered through
+the doubly-wrapped expression.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `asp-for` |
+| Required | No |
+| Default | `null` |
+
+### `ShowLabel`
+
+```csharp
+[HtmlAttributeName("show-label")]
+public bool ShowLabel { get; set; } = true;
+```
+
+Lets consumers opt-out of the inline label rendered by your component template.
+Default is `true`.
+
+### `Disabled`
+
+```csharp
+[HtmlAttributeName("disabled")]
+public bool Disabled { get; set; }
+```
+
+A boolean that maps to the consumer-facing `disabled` HTML attribute, surfaced as
+a C# bool so your template can branch on it without having to parse strings.
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticComponent.ProcessAsync`, which renders the Razor partial
+view associated with the component.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInput](/reference/static-input)
+- [StaticCheckbox](/reference/static-checkbox)
+- [StaticRadio](/reference/static-radio)
+- [StaticSelect](/reference/static-select)

@@ -1,0 +1,105 @@
+---
+title: 'StaticButton'
+description: 'API reference for the StaticButton headless base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: StaticComponent" variant="note" />
+
+`StaticButton` is a headless base class for `<button>` components. Unlike the
+input headless classes, it does not bind to a model — buttons don't have an
+`asp-for` analogue. It adds a validated `type` attribute and a `Disabled` flag,
+leaving styling and child content composition to your component template.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesButton : StaticButton { }
+```
+
+```razor
+@* ~/Views/Components/PinesButton.cshtml *@
+@model PinesButton
+
+<button type="@Model.Type"
+        disabled="@(Model.Disabled ? "disabled" : null)"
+        class="…">
+    @Model.ChildContent
+</button>
+```
+
+```razor
+@* consumer view *@
+<pines-button type="submit">Save changes</pines-button>
+<pines-button type="button" disabled="true">Loading…</pines-button>
+```
+
+## Public Properties
+
+### `Type`
+
+```csharp
+[HtmlAttributeName("type")]
+public string Type { get; set; } = "button";
+```
+
+The HTML `type` attribute the rendered `<button>` should carry. Only
+`"button"`, `"submit"` and `"reset"` are accepted — any other value throws
+`ArgumentException` at render time, so typos surface immediately instead of
+producing broken HTML.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `type` |
+| Required | No |
+| Default | `"button"` |
+| Accepted values | `"button"`, `"submit"`, `"reset"` |
+
+### `Disabled`
+
+```csharp
+[HtmlAttributeName("disabled")]
+public bool Disabled { get; set; } = false;
+```
+
+A boolean that maps to the consumer-facing `disabled` HTML attribute, surfaced
+as a C# bool so your template can branch on it directly.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `disabled` |
+| Required | No |
+| Default | `false` |
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Validates that `Type` is one of the three accepted values and then delegates to
+`StaticComponent.ProcessAsync`.
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| `Type` is null, empty, or not one of `"button"` / `"submit"` / `"reset"` | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticComponent](/reference/static-component)

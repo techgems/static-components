@@ -1,0 +1,90 @@
+---
+title: 'StaticRadioTagHelper'
+description: 'API reference for the static-radio-for tag helper on <input> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;input&gt;" variant="success" />
+
+`StaticRadioTagHelper` is the tag helper that powers `static-radio-for` on
+`<input>` elements. It always emits `type="radio"`, uses an explicit `value`
+attribute as the option key, and adds `checked` when the bound model value
+matches that key.
+
+This tag helper is used **declaratively** — apply the `static-radio-for`
+attribute on an `<input>` inside a Razor template for a component inheriting
+from `StaticRadio`.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<input static-radio-for="@Model.InputExpression" value="…" />
+```
+
+## Usage
+
+```razor
+@model PinesRadio
+
+<input static-radio-for="@Model.InputExpression"
+       value="@Model.Value"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="…" />
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("static-radio-for")]
+public ModelExpression InputExpression { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's actual property.
+
+### `Value`
+
+```csharp
+[HtmlAttributeName("value")]
+public string? Value { get; set; }
+```
+
+The option value this radio instance represents. **Required** — the tag helper
+throws `ArgumentException` if `Value` is `null`.
+
+## Supported Model Types
+
+`string`, `int`, `short`, `long`, `byte`, `bool`, `Enum` and their nullable
+counterparts.
+
+## Behavior
+
+When processed, the tag helper:
+
+1. Validates the inner model type is supported (throws otherwise).
+2. Validates `Value` is not `null` (throws otherwise).
+3. Forces `type="radio"` on the output.
+4. Sets `name`, `id` and the `data-val-*` attributes through `StaticHeadlessUtils`.
+5. Emits the rendered `value` attribute by formatting `Value` through `FormatModelValue` (invariant-culture formatting).
+6. Adds `checked="checked"` when no explicit `checked` is already on the output and `Value` equals the model value's string representation.
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Inner property is not one of the supported model types | `ArgumentException` |
+| `Value` is `null` | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticRadio](/reference/static-radio)

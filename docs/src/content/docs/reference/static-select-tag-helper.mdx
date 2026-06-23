@@ -1,0 +1,102 @@
+---
+title: 'StaticSelectTagHelper'
+description: 'API reference for the static-for tag helper on <select> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;select&gt;" variant="success" />
+
+`StaticSelectTagHelper` is the tag helper that powers `static-for` and
+`static-items` on `<select>` elements. It renders `<option>` and `<optgroup>`
+tags from a `SelectListItem` collection, honors authored child content, and
+resolves selection from the bound model value first.
+
+This tag helper is used **declaratively** — apply the `static-for` attribute
+on a `<select>` inside a Razor template for a component inheriting from
+`StaticSelect`.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<select static-for="@Model.InputExpression" static-items="@Model.Items"></select>
+```
+
+## Usage
+
+```razor
+@model PinesSelect
+
+<select static-for="@Model.InputExpression"
+        static-items="@Model.Items"
+        disabled="@(Model.Disabled ? "disabled" : null)"
+        class="…">
+</select>
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("static-for")]
+public ModelExpression InputExpression { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's actual property.
+
+### `Items`
+
+```csharp
+[HtmlAttributeName("static-items")]
+public List<SelectListItem> Items { get; set; } = new List<SelectListItem>();
+```
+
+The list of items rendered inside the `<select>`. Items that share a
+`SelectListGroup` reference are rendered together inside a single `<optgroup>`
+at the position of the group's first occurrence.
+
+## Supported Model Types
+
+`Guid`, `string`, `int`, `long`, `short`, `byte`, `float`, `double`, `decimal`,
+`DateTime` and their nullable counterparts. **`bool` is not supported.**
+
+## Behavior
+
+When processed (`ProcessAsync`), the tag helper:
+
+1. Validates the inner model type is supported (throws otherwise).
+2. Sets `name`, `id` and the `data-val-*` attributes through `StaticHeadlessUtils`.
+3. Determines whether the bound model value matches at least one item Value (formatted via `FormatModelValue` for invariant-culture comparison).
+4. Walks `Items` in original order:
+   - Ungrouped items render inline as `<option>` tags.
+   - The first item of a group emits an opening `<optgroup label="…">`, followed by every item sharing that group reference, followed by `</optgroup>`. Subsequent occurrences of the same group reference are skipped.
+   - Groups are compared by reference — two `SelectListGroup` instances with the same `Name` but distinct references render as separate `<optgroup>` blocks.
+   - `SelectListGroup.Disabled` is rendered as `disabled` on the `<optgroup>`.
+5. Appends any authored child content (e.g. a leading placeholder `<option>`) and writes the combined HTML to the `<select>`'s content.
+
+### Selection priority
+
+| Condition | Result |
+|---|---|
+| Model value matches one of the item Values | That item is `selected`; every `SelectListItem.Selected` flag is **ignored**. |
+| Model value is `null` | Fall back to `SelectListItem.Selected`. |
+| Model value does not match any item | Fall back to `SelectListItem.Selected`. |
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Inner property is not one of the supported model types | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticSelect](/reference/static-select)

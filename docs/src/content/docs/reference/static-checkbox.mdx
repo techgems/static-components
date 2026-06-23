@@ -1,0 +1,113 @@
+---
+title: 'StaticCheckbox'
+description: 'API reference for the StaticCheckbox abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticInputBase" variant="note" />
+
+`StaticCheckbox` is the headless base class for checkbox `<input>` components.
+It adds the two attributes specific to checkboxes — `Value` (the value posted
+when the box is checked) and `Checked` (an explicit override of the bool
+model's checked state).
+
+Inside the component's Razor template, bind the inner `<input>` via the
+`static-checkbox-for` tag helper.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesCheckbox : StaticCheckbox { }
+```
+
+```razor
+@* ~/Views/Components/PinesCheckbox.cshtml *@
+@model PinesCheckbox
+
+<input static-checkbox-for="@Model.InputExpression"
+       checked="@Model.Checked"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="…" />
+
+@if (Model.ShowLabel)
+{
+    <label static-for="@Model.InputExpression" class="…"></label>
+}
+```
+
+```razor
+@* consumer view *@
+<pines-checkbox asp-for="Form.AcceptsTerms"></pines-checkbox>
+```
+
+## Public Properties
+
+### `Value`
+
+```csharp
+[HtmlAttributeName("value")]
+public string? Value { get; set; }
+```
+
+The value posted when the checkbox is checked. Optional — the
+`static-checkbox-for` tag helper unconditionally emits `value="true"` on the
+inner `<input>` regardless of this property, but consumers can still author it
+explicitly for clarity.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `value` |
+| Required | No |
+| Default | `null` |
+
+### `Checked`
+
+```csharp
+[HtmlAttributeName("checked")]
+public bool Checked { get; set; } = false;
+```
+
+Lets a consumer mark the checkbox as checked regardless of the bound model
+value. Useful for visually-checked states driven by something other than the
+bound property.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `checked` |
+| Required | No |
+| Default | `false` |
+
+## Inherited Properties
+
+- `InputExpression` (`asp-for`)
+- `ShowLabel` (`show-label`)
+- `Disabled` (`disabled`)
+
+See [`StaticInputBase`](/reference/static-input-base) for the full descriptions.
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticInputBase.ProcessAsync`.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInputBase](/reference/static-input-base)
+- [StaticCheckboxTagHelper](/reference/static-checkbox-tag-helper)

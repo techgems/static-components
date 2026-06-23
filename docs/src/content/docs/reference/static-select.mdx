@@ -1,0 +1,98 @@
+---
+title: 'StaticSelect'
+description: 'API reference for the StaticSelect abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticInputBase" variant="note" />
+
+`StaticSelect` is the headless base class for `<select>` components. It adds an
+`Items` property mapped from the consumer-facing `asp-items` attribute, so
+consumers can supply options exactly as they would to a native `<select>`.
+
+Inside the component's Razor template, bind the inner `<select>` via the
+`static-for` and `static-items` tag helpers.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesSelect : StaticSelect { }
+```
+
+```razor
+@* ~/Views/Components/PinesSelect.cshtml *@
+@model PinesSelect
+
+<select static-for="@Model.InputExpression"
+        static-items="@Model.Items"
+        disabled="@(Model.Disabled ? "disabled" : null)"
+        class="…">
+</select>
+```
+
+```razor
+@* consumer view *@
+<pines-select asp-for="Form.Department"
+              asp-items="@Model.DepartmentOptions"></pines-select>
+```
+
+## Public Properties
+
+### `Items`
+
+```csharp
+[HtmlAttributeName("asp-items")]
+public List<SelectListItem> Items { get; set; } = new List<SelectListItem>();
+```
+
+The list of `SelectListItem`s rendered as `<option>` tags inside the inner
+`<select>`. Items that share a `SelectListGroup` reference are grouped into a
+single `<optgroup>` at the position of the group's first occurrence.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `asp-items` |
+| Required | No |
+| Default | empty list |
+
+## Inherited Properties
+
+- `InputExpression` (`asp-for`)
+- `ShowLabel` (`show-label`)
+- `Disabled` (`disabled`)
+
+See [`StaticInputBase`](/reference/static-input-base) for the full descriptions.
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticInputBase.ProcessAsync`.
+
+<Aside type="tip">
+Selection priority: if the bound model value matches one of the item values, that
+item is marked `selected` and the `Selected` flags on every other item are
+ignored. Only when the model value is `null` or doesn't match any item does the
+helper fall back to honoring `SelectListItem.Selected`.
+</Aside>
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInputBase](/reference/static-input-base)
+- [StaticSelectTagHelper](/reference/static-select-tag-helper)

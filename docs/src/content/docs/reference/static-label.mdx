@@ -1,0 +1,81 @@
+---
+title: 'StaticLabel'
+description: 'API reference for the StaticLabel abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticComponent" variant="note" />
+
+`StaticLabel` is the headless base class for standalone `<label>` components.
+Use it when your UI kit needs a label that can sit next to any input rather
+than living inside an input component's template.
+
+Note that `StaticLabel` inherits from `StaticComponent` (not `StaticInputBase`)
+and exposes the bound expression as **`For`** instead of `InputExpression` —
+but the consumer-facing attribute is still `asp-for`.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesLabel : StaticLabel { }
+```
+
+```razor
+@* ~/Views/Components/PinesLabel.cshtml *@
+@model PinesLabel
+
+<label static-for="@Model.For" class="…"></label>
+```
+
+```razor
+@* consumer view *@
+<pines-label asp-for="Form.FullName"></pines-label>
+```
+
+The rendered label content comes from the property's `[DisplayName]` if
+present, otherwise the property name itself.
+
+## Public Properties
+
+### `For`
+
+```csharp
+[HtmlAttributeName("asp-for")]
+public ModelExpression For { get; set; } = default!;
+```
+
+The `ModelExpression` resolved from the consumer-facing `asp-for` attribute.
+Pass this to the inner `<label>` via `static-for`.
+
+| Attribute | Value |
+|---|---|
+| HTML attribute | `asp-for` |
+| Required | Yes |
+| Default | none |
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticComponent.ProcessAsync`.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticLabelTagHelper](/reference/static-label-tag-helper)
+- [HeadlessUtils](/reference/headless-utils) — `GetLabelContent` resolves label text the same way.

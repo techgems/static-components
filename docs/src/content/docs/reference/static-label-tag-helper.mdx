@@ -1,0 +1,69 @@
+---
+title: 'StaticLabelTagHelper'
+description: 'API reference for the static-for tag helper on <label> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;label&gt;" variant="success" />
+
+`StaticLabelTagHelper` is the tag helper that powers `static-for` on `<label>`
+elements. It populates the `for` attribute and the label content using the
+doubly-wrapped `ModelExpression` produced by a headless component.
+
+This tag helper is used **declaratively** — apply the `static-for` attribute
+on a `<label>` inside a Razor template for a headless input or label component.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<label static-for="@Model.InputExpression"></label>
+```
+
+## Usage
+
+```razor
+<label static-for="@Model.InputExpression" class="…"></label>
+```
+
+## Public Properties
+
+### `StaticFor`
+
+```csharp
+[HtmlAttributeName("static-for")]
+public ModelExpression StaticFor { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's actual property.
+
+### `LabelContent`
+
+```csharp
+[HtmlAttributeNotBound]
+public string LabelContent { get; }
+```
+
+The text rendered inside the `<label>`. Resolves to the inner property's
+`[DisplayName]` if present, otherwise the inner property's name, otherwise an
+empty string.
+
+## Behavior
+
+When processed, the tag helper:
+
+1. Sets the `for` attribute to the inner expression's `Name`.
+2. Sets the label's text content to `LabelContent`.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticLabel](/reference/static-label)
+- [HeadlessUtils](/reference/headless-utils) — `GetLabelContent` performs the same resolution outside the tag helper.

@@ -1,0 +1,77 @@
+---
+title: 'StaticCheckboxTagHelper'
+description: 'API reference for the static-checkbox-for tag helper on <input> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;input&gt;" variant="success" />
+
+`StaticCheckboxTagHelper` is the tag helper that powers `static-checkbox-for`
+on `<input>` elements. It always emits `type="checkbox"`, `value="true"`, the
+paired hidden `value="false"` (so unchecked submits a value), and `checked`
+based on the bool model value.
+
+This tag helper is used **declaratively** — apply the `static-checkbox-for`
+attribute on an `<input>` inside a Razor template for a component inheriting
+from `StaticCheckbox`.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<input static-checkbox-for="@Model.InputExpression" />
+```
+
+## Usage
+
+```razor
+@model PinesCheckbox
+
+<input static-checkbox-for="@Model.InputExpression"
+       checked="@Model.Checked"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="…" />
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("static-checkbox-for")]
+public ModelExpression InputExpression { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's `bool` property.
+
+## Supported Model Types
+
+Only `bool`. Any other type throws `ArgumentException`.
+
+## Behavior
+
+When processed, the tag helper:
+
+1. Validates the inner model type is `bool` (throws otherwise).
+2. Sets `name`, `id` and the full set of `data-val-*` attributes through `StaticHeadlessUtils`.
+3. Forces `type="checkbox"` and `value="true"` on the output (overwriting any author-provided values).
+4. Adds `checked="checked"` when the bool model value is `true` and no explicit `checked` attribute is already set.
+5. Appends a paired hidden `<input type="hidden" name="…" value="false" />` to the output's PostElement so the form posts `false` when the checkbox is unchecked.
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Inner property is not `bool` | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticCheckbox](/reference/static-checkbox)

@@ -1,0 +1,59 @@
+---
+title: 'HeadlessUtils'
+description: 'API reference for the HeadlessUtils static helper class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Static" variant="note" />
+
+`HeadlessUtils` is a public static class with helper methods for headless
+component templates. Today it exposes a single method for resolving label text
+the same way `StaticLabelTagHelper` does — useful when you want that resolution
+inside a custom template that isn't built around a `<label>` element.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Public Methods
+
+### `GetLabelContent(ModelExpression modelExpression)`
+
+```csharp
+public static string GetLabelContent(ModelExpression modelExpression)
+```
+
+Returns the text to render as a label for the given expression.
+
+Resolution order:
+
+1. The expression's `Metadata.DisplayName` (i.e. the value of `[DisplayName]`).
+2. The expression's `Metadata.PropertyName`.
+3. `string.Empty`.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `modelExpression` | `ModelExpression` | The expression to derive label content for. |
+
+**Returns:** `string`
+
+## Usage
+
+```razor
+@using TechGems.StaticComponents.Headless
+
+@model PinesField
+
+<div class="field">
+    <span class="label">@HeadlessUtils.GetLabelContent(Model.InputExpression)</span>
+    <input static-for="@Model.InputExpression" class="…" />
+</div>
+```
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticLabelTagHelper](/reference/static-label-tag-helper) — uses the same resolution internally.

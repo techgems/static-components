@@ -1,0 +1,79 @@
+---
+title: 'StaticInput'
+description: 'API reference for the StaticInput abstract base class.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Abstract" variant="caution" /> <Badge text="Inherits: StaticInputBase" variant="note" />
+
+`StaticInput` is the headless base class for free-text `<input>` and
+`<textarea>` components — text, number, date, email, password, etc. It adds
+no new properties over `StaticInputBase`; its purpose is to be a clear
+inheritance target so a UI kit can name and style text-style inputs
+distinctly from checkboxes, radios and selects.
+
+In the component's Razor template, bind the inner `<input>` (or `<textarea>`)
+via the `static-for` tag helper.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```csharp
+using TechGems.StaticComponents.Headless;
+
+namespace YourAssembly.Views.Components;
+
+public class PinesInput : StaticInput { }
+```
+
+```razor
+@* ~/Views/Components/PinesInput.cshtml *@
+@model PinesInput
+
+@if (Model.ShowLabel)
+{
+    <label static-for="@Model.InputExpression" class="…"></label>
+}
+
+<input static-for="@Model.InputExpression"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="…" />
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.FullName"></pines-input>
+<pines-input asp-for="Form.SignupEmail"></pines-input>   @* type inferred from [DataType] *@
+<pines-input asp-for="Form.Password" type="password"></pines-input>
+```
+
+## Inherited Properties
+
+- `InputExpression` (`asp-for`)
+- `ShowLabel` (`show-label`)
+- `Disabled` (`disabled`)
+
+See [`StaticInputBase`](/reference/static-input-base) for the full descriptions.
+
+## Methods
+
+### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
+
+```csharp
+public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+```
+
+Delegates to `StaticInputBase.ProcessAsync`.
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInputBase](/reference/static-input-base)
+- [StaticInputTagHelper](/reference/static-input-tag-helper) — the `<input>` tag helper used inside the template.
+- [StaticTextAreaTagHelper](/reference/static-text-area-tag-helper) — the `<textarea>` tag helper used inside the template.

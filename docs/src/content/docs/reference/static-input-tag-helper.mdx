@@ -1,0 +1,127 @@
+---
+title: 'StaticInputTagHelper'
+description: 'API reference for the static-for tag helper on <input> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;input&gt;" variant="success" />
+
+`StaticInputTagHelper` is the tag helper that powers `static-for` on `<input>`
+elements inside headless component templates. It reaches through the
+doubly-wrapped `ModelExpression` to recover the original property metadata and
+emits `type`, `name`, `id`, `value` and the `data-val-*` validation attributes
+the built-in `asp-for` tag helper would produce on a regular Razor view.
+
+This tag helper is used **declaratively** — you do not instantiate it
+manually. Apply the `static-for` attribute on an `<input>` inside a Razor
+template for a component inheriting from `StaticInput` (or any subclass).
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<input static-for="@Model.InputExpression" />
+```
+
+## Usage
+
+```razor
+@model PinesInput
+
+<input static-for="@Model.InputExpression"
+       disabled="@(Model.Disabled ? "disabled" : null)"
+       class="…" />
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("static-for")]
+public ModelExpression InputExpression { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's actual property.
+
+### `Type`
+
+```csharp
+[HtmlAttributeName("type")]
+public string? Type { get; set; } = null;
+```
+
+An optional override for the rendered `type` attribute. When set, it must be
+one of the supported HTML input types (see below); otherwise the type is
+inferred from the inner property's CLR type and `[DataType]` attribute.
+
+### `Value`
+
+```csharp
+[HtmlAttributeName("value")]
+public string? Value { get; set; } = null;
+```
+
+An optional explicit override for the `value` attribute. When unset, the
+attribute is populated from the inner property's current model value.
+
+## Supported Model Types
+
+`Guid`, `string`, `int`, `long`, `short`, `byte`, `float`, `double`, `decimal`,
+`DateTime` and their nullable counterparts. **`bool` is not supported** —
+checkbox inputs go through [`StaticCheckboxTagHelper`](/reference/static-checkbox-tag-helper).
+
+## Supported `type` Values
+
+```
+text, number, date, email, password, tel, url, search,
+color, datetime-local, month, time, week, hidden
+```
+
+`"checkbox"` and `"radio"` are **not** accepted — those have dedicated tag
+helpers.
+
+## Type Inference
+
+When `Type` is not set, the inferred value comes from:
+
+1. `[HiddenInput]` on the inner property → `hidden`.
+2. `[DataType(DataType.Password)]` → `password`.
+3. `[DataType(DataType.EmailAddress)]` → `email`.
+4. `[DataType(DataType.Url)]` → `url`.
+5. `[DataType(DataType.PhoneNumber)]` → `tel`.
+6. The inner property's CLR type:
+   - `string` / `Guid` → `text`
+   - any integer / floating-point / decimal → `number`
+   - `DateTime` → `date`
+   - everything else → `text`
+
+## Behavior
+
+When processed, the tag helper:
+
+1. Validates the inner model type is supported (throws `ArgumentException` otherwise).
+2. Validates an explicit `Type` (if provided) is in the supported set.
+3. Resolves the final `type` and sets it on the output.
+4. Sets `name`, `id` and the full set of `data-val-*` attributes through `StaticHeadlessUtils`.
+5. Populates `value` from the model value when no explicit `value` was authored.
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Inner property is not one of the supported model types | `ArgumentException` |
+| Explicit `type` is not in the supported set (e.g. `"checkbox"`, `"radio"`, `"not-a-type"`) | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInput](/reference/static-input)
+- [StaticTextAreaTagHelper](/reference/static-text-area-tag-helper) — same idea for `<textarea>`.

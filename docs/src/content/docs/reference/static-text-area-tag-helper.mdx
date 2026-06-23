@@ -1,0 +1,83 @@
+---
+title: 'StaticTextAreaTagHelper'
+description: 'API reference for the static-for tag helper on <textarea> elements.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: &lt;textarea&gt;" variant="success" />
+
+`StaticTextAreaTagHelper` is the tag helper that powers `static-for` on
+`<textarea>` elements. It mirrors `StaticInputTagHelper` but is locked to
+`string` model properties.
+
+This tag helper is used **declaratively** — apply the `static-for` attribute
+on a `<textarea>` inside a Razor template for a component inheriting from
+`StaticInput`.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<textarea static-for="@Model.InputExpression"></textarea>
+```
+
+## Usage
+
+```razor
+@model PinesTextArea
+
+<textarea static-for="@Model.InputExpression"
+          disabled="@(Model.Disabled ? "disabled" : null)"
+          class="…"></textarea>
+```
+
+## Public Properties
+
+### `InputExpression`
+
+```csharp
+[HtmlAttributeName("static-for")]
+public ModelExpression InputExpression { get; set; }
+```
+
+The outer `ModelExpression` — its `.ModelExplorer.Model` is expected to be
+another `ModelExpression` bound to the consumer's `string` property.
+
+### `Type`
+
+```csharp
+[HtmlAttributeName("type")]
+public string? Type { get; set; } = null;
+```
+
+Reserved for future use. Currently unused by the tag helper.
+
+## Supported Model Types
+
+Only `string`. Any other type throws `ArgumentException`.
+
+## Behavior
+
+When processed, the tag helper:
+
+1. Validates the inner model type is `string` (throws otherwise).
+2. Sets `name`, `id` and the `data-val-*` attributes through `StaticHeadlessUtils`.
+3. Populates a `value` attribute from the model value when no explicit `value` was authored.
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Inner property is not `string` | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticInput](/reference/static-input)
+- [StaticInputTagHelper](/reference/static-input-tag-helper) — same model for `<input>`.
