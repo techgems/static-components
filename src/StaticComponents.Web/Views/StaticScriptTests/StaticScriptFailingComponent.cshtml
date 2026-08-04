@@ -1,0 +1,8 @@
+@using StaticComponents.Web.Views.StaticScriptTests
+@model StaticScriptFailingComponent
+
+<div>
+    <p>This component renders a <code>static-script</code> with neither a body nor a <code>src</code> attribute, which is the invalid case.</p>
+
+    <script static-script type="text/javascript" />
+</div>

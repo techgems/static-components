@@ -1,0 +1,19 @@
+@page
+@model StaticComponents.Web.Pages.StaticScriptTests.FailingModel
+@{
+    ViewData["Title"] = "static-script that fails";
+}
+
+<h1>static-script — failing case</h1>
+
+<p>
+    This page renders a <code>&lt;script static-script&gt;</code> with neither a body nor a
+    <code>src</code> attribute. This is the invalid usage that <code>static-script</code> guards against.
+</p>
+<p>
+    <strong>Expected result:</strong> this page throws an <code>ArgumentNullException</code>. The guard now
+    rejects a body that is <code>null</code> <em>or</em> empty, so requesting this page returns an error
+    instead of rendering.
+</p>
+
+<static-script-failing-component></static-script-failing-component>

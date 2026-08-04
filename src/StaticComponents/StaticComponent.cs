@@ -30,7 +30,7 @@ public abstract class StaticComponent : TagHelper
     {
         var type = GetType();
         var assemblyName = type.Assembly.GetName().Name;
-        _razorViewRoute = $"{type.FullName!.Replace(assemblyName!, "~").Replace(".", "/")}.cshtml";
+        _razorViewRoute = $"{type.FullName!.ReplaceFirst(assemblyName!, "~").Replace(".", "/")}.cshtml";
     }
 
     /// <summary>

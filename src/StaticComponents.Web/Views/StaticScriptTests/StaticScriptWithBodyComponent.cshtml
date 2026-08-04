@@ -1,0 +1,11 @@
+@using StaticComponents.Web.Views.StaticScriptTests
+@model StaticScriptWithBodyComponent
+
+<div>
+    <p>This component renders a <code>static-script</code> that has an inline body (no <code>src</code> attribute).</p>
+
+    <script static-script type="text/javascript">
+        console.log("static-script with body executed.");
+        document.currentScript?.closest("div")?.setAttribute("data-static-script-body", "ran");
+    </script>
+</div>

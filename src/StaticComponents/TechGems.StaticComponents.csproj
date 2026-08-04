@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.2</Version>
+    <Version>1.3.4</Version>
     <Authors>Carlos Jimenez</Authors>
     <Product>Static Components</Product>
     <Description>Build component-driven UIs in ASP.NET Core without leaving Razor Pages — no JavaScript framework required.</Description>
@@ -17,7 +17,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageReleaseNotes>
-		- Add extension function to more easily extract label content from model expressions.
+		- Fix bug in which default view wouldn't route resolve correctly when the name of the assembly was repeated in the route.
+		- Fix bug in which static-script wouldn't render because it was missing a script body when using the src property.
 	</PackageReleaseNotes>
   </PropertyGroup>
 

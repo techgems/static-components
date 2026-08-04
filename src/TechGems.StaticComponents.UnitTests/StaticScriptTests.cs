@@ -49,6 +49,25 @@ public class StaticScriptTests
             });
     }
 
+    private static TagHelperOutput CreateTagHelperOutputWithNullContent(TagHelperAttributeList? attributes = null)
+    {
+        attributes ??= new TagHelperAttributeList();
+        return new TagHelperOutput(
+            tagName: "script",
+            attributes: attributes,
+            getChildContentAsync: (useCachedResult, encoder) =>
+                Task.FromResult<TagHelperContent>(new NullTagHelperContent()));
+    }
+
+    /// <summary>
+    /// A <see cref="TagHelperContent"/> whose <c>GetContent()</c> returns <see langword="null"/>,
+    /// mirroring the "no script body" case the tag helper guards against.
+    /// </summary>
+    private sealed class NullTagHelperContent : DefaultTagHelperContent
+    {
+        public override string GetContent(System.Text.Encodings.Web.HtmlEncoder encoder) => null!;
+    }
+
     private static StaticScript CreateStaticScript(
         ViewContext viewContext,
         bool teleportScript = false,
@@ -427,18 +446,52 @@ public class StaticScriptTests
     }
 
     [Test]
-    public async Task ProcessAsync_EmptyChildContent_StillRendersScriptTag()
+    public void ProcessAsync_NoSrcAndEmptyChildContent_ThrowsArgumentNullException()
     {
         var viewContext = CreateViewContext();
         var tagHelper = CreateStaticScript(viewContext);
         var context = CreateTagHelperContext();
         var output = CreateTagHelperOutput("");
 
-        await ExecuteTagHelper(tagHelper, context, output);
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await ExecuteTagHelper(tagHelper, context, output));
+    }
 
-        var content = output.Content.GetContent();
-        Assert.That(content, Does.Contain("<script>"));
-        Assert.That(content, Does.Contain("</script>"));
+    [Test]
+    public void ProcessAsync_NoSrcAndWhitespaceChildContent_ThrowsArgumentNullException()
+    {
+        var viewContext = CreateViewContext();
+        var tagHelper = CreateStaticScript(viewContext);
+        var context = CreateTagHelperContext();
+        var output = CreateTagHelperOutput("     ");
+
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await ExecuteTagHelper(tagHelper, context, output));
+    }
+
+    [Test]
+    public void ProcessAsync_NoSrcAndNullChildContent_ThrowsArgumentNullException()
+    {
+        var viewContext = CreateViewContext();
+        var tagHelper = CreateStaticScript(viewContext);
+        var context = CreateTagHelperContext();
+        var output = CreateTagHelperOutputWithNullContent();
+
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await ExecuteTagHelper(tagHelper, context, output));
+    }
+
+    [Test]
+    public void ProcessAsync_NoScriptBodyButHasSrcAttribute_DoesNotThrow()
+    {
+        var viewContext = CreateViewContext();
+        var attributes = new TagHelperAttributeList { { "src", "app.js" } };
+        var tagHelper = CreateStaticScript(viewContext);
+        var context = CreateTagHelperContext(attributes);
+        var output = CreateTagHelperOutput("", attributes);
+
+        Assert.DoesNotThrowAsync(async () =>
+            await ExecuteTagHelper(tagHelper, context, output));
     }
 
     [Test]

@@ -47,10 +47,10 @@ public class StaticScript : StaticComponent
         }
 
         var childContent = (await output.GetChildContentAsync()).GetContent();
+        var hasSrcAttribute = output.Attributes.ContainsName("src");
 
-
-        if (childContent is null)
-            throw new ArgumentNullException("A static-script attributed script tag must not be empty.");
+        if(!hasSrcAttribute && string.IsNullOrWhiteSpace(childContent))
+            throw new ArgumentNullException("A static-script attributed <script> must contain a script or an src attribute.");
 
         ProcessScripts(output, childContent);
     }
