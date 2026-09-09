@@ -62,6 +62,27 @@ An optional override for the rendered `type` attribute. When set, it must be
 one of the supported HTML input types (see below); otherwise the type is
 inferred from the inner property's CLR type and `[DataType]` attribute.
 
+<Aside type="caution" title="static-for owns type">
+`static-for` always sets `type`, either from this property or by inference. That means `type` is
+never carried by [attribute passthrough](/reference/static-attributes-tag-helper) — a `type` a
+consumer writes on your component is ignored rather than applied and then silently overwritten.
+
+To let consumers choose the type, declare a property for it on your component and write it into the
+template yourself:
+
+```csharp
+public class PinesInput : StaticInput
+{
+    [HtmlAttributeName("type")]
+    public string? Type { get; set; }
+}
+```
+
+```razor
+<input static-for="@Model.InputExpression" type="@Model.Type" class="…" />
+```
+</Aside>
+
 ### `Value`
 
 ```csharp

@@ -72,6 +72,30 @@ public bool Disabled { get; set; }
 A boolean that maps to the consumer-facing `disabled` HTML attribute, surfaced as
 a C# bool so your template can branch on it without having to parse strings.
 
+### `AdditionalAttributes`
+
+```csharp
+[HtmlAttributeNotBound]
+public StaticAttributeCollection AdditionalAttributes { get; private set; }
+```
+
+Every HTML attribute the consumer wrote on your component that wasn't bound to one of its C#
+properties. Apply it to an element in your template with the
+[`static-attributes`](/reference/static-attributes-tag-helper) tag helper so end users can pass
+arbitrary markup — `placeholder`, `data-*`, `aria-*`, Alpine and HTMX bindings — through to the
+rendered element:
+
+```razor
+<input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       class="block w-full rounded-md border px-3 py-2" />
+```
+
+Nothing is passed through until you add `static-attributes` to your template, so adding this to an
+existing component is opt-in. See
+[`StaticAttributeCollection`](/reference/static-attribute-collection) for the filtering methods that
+let you route different attributes to different elements.
+
 ## Methods
 
 ### `ProcessAsync(TagHelperContext context, TagHelperOutput output)`
@@ -90,3 +114,5 @@ view associated with the component.
 - [StaticCheckbox](/reference/static-checkbox)
 - [StaticRadio](/reference/static-radio)
 - [StaticSelect](/reference/static-select)
+- [StaticAttributeCollection](/reference/static-attribute-collection) — the type of `AdditionalAttributes`.
+- [StaticAttributesTagHelper](/reference/static-attributes-tag-helper) — applies it in your template.

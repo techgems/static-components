@@ -25,11 +25,17 @@ TechGems.StaticComponents.Headless
 ## Usage
 
 ```csharp
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using TechGems.StaticComponents.Headless;
 
 namespace YourAssembly.Views.Components;
 
-public class PinesInput : StaticInput { }
+public class PinesInput : StaticInput
+{
+    //static-for owns the type attribute, so declare a property for it to let consumers set it.
+    [HtmlAttributeName("type")]
+    public string? Type { get; set; }
+}
 ```
 
 ```razor
@@ -42,6 +48,8 @@ public class PinesInput : StaticInput { }
 }
 
 <input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       type="@Model.Type"
        disabled="@(Model.Disabled ? "disabled" : null)"
        class="…" />
 ```
@@ -51,6 +59,7 @@ public class PinesInput : StaticInput { }
 <pines-input asp-for="Form.FullName"></pines-input>
 <pines-input asp-for="Form.SignupEmail"></pines-input>   @* type inferred from [DataType] *@
 <pines-input asp-for="Form.Password" type="password"></pines-input>
+<pines-input asp-for="Form.Nickname" placeholder="Optional" autocomplete="off"></pines-input>
 ```
 
 ## Inherited Properties
@@ -58,6 +67,7 @@ public class PinesInput : StaticInput { }
 - `InputExpression` (`asp-for`)
 - `ShowLabel` (`show-label`)
 - `Disabled` (`disabled`)
+- `AdditionalAttributes` (everything else the consumer wrote)
 
 See [`StaticInputBase`](/reference/static-input-base) for the full descriptions.
 
@@ -77,3 +87,4 @@ Delegates to `StaticInputBase.ProcessAsync`.
 - [StaticInputBase](/reference/static-input-base)
 - [StaticInputTagHelper](/reference/static-input-tag-helper) — the `<input>` tag helper used inside the template.
 - [StaticTextAreaTagHelper](/reference/static-text-area-tag-helper) — the `<textarea>` tag helper used inside the template.
+- [StaticAttributesTagHelper](/reference/static-attributes-tag-helper) — passes consumer attributes through to the template.

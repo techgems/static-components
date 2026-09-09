@@ -1,0 +1,14 @@
+﻿@model StaticComponents.Web.Views.InputStatic.InputStaticPassthroughTest;
+
+<div class="mb-4" static-attributes="@Model.AdditionalAttributes.WithPrefix("x-", "hx-")">
+    @if (Model.ShowLabel)
+    {
+        <label static-for="@Model.InputExpression" class="text-sm font-medium leading-none"></label>
+    }
+
+    <input static-for="@Model.InputExpression"
+           static-attributes="@Model.AdditionalAttributes.WithoutPrefix("x-", "hx-")"
+           disabled="@(Model.Disabled ? "true" : null)"
+           placeholder="Type something"
+           class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 disabled:opacity-50" />
+</div>

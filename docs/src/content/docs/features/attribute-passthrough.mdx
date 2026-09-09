@@ -1,0 +1,154 @@
+---
+title: 'Attribute Passthrough'
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A UI kit can't anticipate every attribute its users will need. Rather than adding
+a C# property for each of `placeholder`, `autocomplete`, `aria-describedby`,
+`data-*`, `x-on:input` and so on, let them pass straight through.
+
+The examples below carry on from
+[Headless Components](/features/headless-components), where `PinesInput` is a
+component inheriting `StaticInput`.
+
+Every component inheriting `StaticInputBase` exposes an `AdditionalAttributes`
+collection holding whatever the consumer wrote that wasn't bound to one of its
+properties. Apply it to an element in your template with `static-attributes`:
+
+```razor
+@model PinesInput
+
+<input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       placeholder="Type something"
+       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.Email"
+             class="mt-4"
+             placeholder="you@example.com"
+             autocomplete="email"
+             data-testid="email"
+             required />
+```
+
+```html
+<!-- rendered -->
+<input placeholder="you@example.com"
+       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm mt-4"
+       autocomplete="email" data-testid="email" required
+       type="email" name="Email" id="Email"
+       data-val="true" data-val-email="…" />
+```
+
+Note that the consumer's `placeholder` replaced the template's, while their
+`class` was appended to it.
+
+<Aside type="note">
+Passthrough is opt-in. Nothing reaches the rendered element until you add
+`static-attributes` to your template, so adding it to an existing component
+changes nothing for current users until you do.
+</Aside>
+
+## Merge rules
+
+| Attribute | Behavior |
+|---|---|
+| `class` | **Merged.** Your classes first, the consumer's appended, duplicates dropped. |
+| `class-replace` | **Replaces.** Discards your `class` entirely. Using it with `class` throws. |
+| `style` | **Merged**, joined with `;`. Inline styles are last-declaration-wins, so the consumer's values take effect. |
+| `type` | **Never passed through.** Owned by the `static-*` tag helpers. |
+| `name`, `id`, `data-val-*` | **Owned by `static-for`.** A consumer can't break model binding from the outside. |
+| everything else | **Consumer wins.** Attributes in your template act as defaults they can override. |
+
+## When merging isn't enough
+
+Merging works cleanly when the consumer is *adding* something — a margin, a grid
+placement. It breaks down when they're trying to *override* one of your classes.
+
+Say `PinesInput` sets a full-width field and a consumer wants a narrow one:
+
+```razor
+<pines-input asp-for="Form.Zip" class="w-32" />
+```
+
+```html
+<!-- rendered: both are on the element -->
+<input class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm w-32" … />
+```
+
+This is a common problem with Tailwind. The input will still render at full width because `w-32` doesn't override the existing `w-full`.
+
+`class-replace` is the escape hatch. It discards your classes entirely, so there
+is nothing left to conflict with:
+
+```razor
+<pines-input asp-for="Form.Zip" class-replace="w-32 rounded-md border px-3 py-2" />
+```
+
+```html
+<!-- rendered: only the consumer's classes -->
+<input class="w-32 rounded-md border px-3 py-2" … />
+```
+
+That gives up every base style your component defines — note that the consumer
+had to restate `rounded-md`, `border` and the padding to keep them. Reach for it
+only when a merge genuinely can't express the override.
+
+## Routing attributes to different elements
+
+Most components render more than a bare `<input>` — usually a wrapper holding the
+label, the field and a validation message. When that's the case, not every
+attribute a consumer passes belongs on the same element, so `AdditionalAttributes`
+is immutable and its filters return new collections you can point at different
+elements.
+
+The attributes that most often need this treatment are the ones from
+[AlpineJS](https://alpinejs.dev/) and [HTMX](https://htmx.org/), the two libraries
+the [HATS stack](/introduction/hats-stack) is built around. Both add behaviour to
+a page by writing HTML attributes instead of JavaScript:
+
+| Prefix | Library | What it does |
+|---|---|---|
+| `x-` | AlpineJS | Declares client-side state and reactivity. `x-show="open"` shows the element while `open` is true; `x-model="email"` two-way binds an input's value to a piece of state. |
+| `hx-` | HTMX | Turns an element into a request. `hx-get="/search"` fetches that URL and swaps the response into the page, with `hx-trigger` and `hx-target` controlling when and where. |
+
+Both are identified by their prefix, which makes the split easy: send everything
+prefixed `x-` or `hx-` to the wrapper, and everything else to the input. That's
+what `WithPrefix` and `WithoutPrefix` are for.
+
+```razor
+@model PinesInput
+
+<div class="relative" static-attributes="@Model.AdditionalAttributes.WithPrefix("x-", "hx-")">
+    <label static-for="@Model.InputExpression" class="block text-sm font-medium"></label>
+
+    <input static-for="@Model.InputExpression"
+           static-attributes="@Model.AdditionalAttributes.WithoutPrefix("x-", "hx-")"
+           class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+</div>
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.Email"
+             x-show="wantsUpdates"
+             hx-target="#email-feedback"
+             placeholder="you@example.com" />
+```
+
+`x-show` and `hx-target` land on the `<div>`, `placeholder` on the `<input>`.
+
+The wrapper is the right home for both. `x-show` there hides the label along with
+the field instead of leaving a dangling label behind, and HTMX inherits most of
+its attributes from ancestor elements, so a request declared on the wrapper still
+governs the input inside it.
+
+`Only` and `Except` filter by exact name instead of prefix, for the occasional
+attribute that needs different placement than its prefix suggests — `x-model`, for
+one, two-way binds an input's value and only works on the `<input>` itself. See
+[`StaticAttributeCollection`](/reference/static-attribute-collection) for the full
+set of filters.

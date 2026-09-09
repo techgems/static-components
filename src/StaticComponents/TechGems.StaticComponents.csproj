@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.4</Version>
+    <Version>1.4.0</Version>
     <Authors>Carlos Jimenez</Authors>
     <Product>Static Components</Product>
     <Description>Build component-driven UIs in ASP.NET Core without leaving Razor Pages — no JavaScript framework required.</Description>
@@ -17,8 +17,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageReleaseNotes>
-		- Fix bug in which default view wouldn't route resolve correctly when the name of the assembly was repeated in the route.
-		- Fix bug in which static-script wouldn't render because it was missing a script body when using the src property.
+		- Add attribute passthrough for headless input components. Components inheriting StaticInputBase now expose an AdditionalAttributes collection holding the HTML attributes a consumer wrote that weren't bound to a C# property, which can be applied to any element in the component's template with the new static-attributes tag helper.
+		- class and style merge with the values authored in the template, and the new class-replace attribute lets a consumer discard the component's classes when a merge can't express the override.
 	</PackageReleaseNotes>
   </PropertyGroup>
 

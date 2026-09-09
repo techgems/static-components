@@ -26,6 +26,42 @@ Razor Class Libraries are useful for creating UI component libraries meant to be
 Razor Class Libraries can be combined with your CSS library of choice to make UI elements easier to use.
 
 
+## Form inputs
+
+Input components are the one part of a UI kit that needs more than a Razor template, so Static Components ships a set of [headless base classes](/features/headless-components) — `StaticInput`, `StaticCheckbox`, `StaticRadio`, `StaticSelect`, `StaticLabel` — that handle the binding for you.
+
+Inherit from the one matching the element you're building, then write your markup:
+
+```csharp
+public class PinesInput : StaticInput { }
+```
+
+```razor
+@model PinesInput
+
+<input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.Email" class="mt-4" placeholder="you@example.com" />
+```
+
+Two attributes are doing the work here, and it's worth being clear about why there are two.
+
+**`asp-for` on the consumer-facing tag exists to give your users a familiar interface.** Anyone who has written an ASP.NET Core form already knows `asp-for`, so binding `<pines-input asp-for="Form.Email">` should feel identical to binding `<input asp-for="Form.Email">`. Your component drops into an existing form with no new convention to learn, and it keeps working with the validation and model binding your users already rely on. Exposing it costs you a single `ModelExpression` property, which the headless base classes already declare.
+
+**`static-for` inside the template is the plumbing that makes that possible.** By the time the expression reaches your inner `<input>` it has been wrapped a second time, and the built-in `asp-for` helper would read the metadata of `ModelExpression` itself rather than of the property your consumer targeted — producing a wrong `name`, `id` and `data-val-*` set. `static-for` reaches through that extra layer. Consumers never see it; it only ever appears inside a headless component's template.
+
+[Headless Components](/features/headless-components) covers the full set of base classes, the matching `static-*` tag helpers for checkboxes, radios, selects and textareas, and the validation attributes they emit.
+
+<Aside type="caution">
+Inside a headless component's template, use `static-for` rather than `asp-for`. Using `asp-for` there compiles and renders, but silently binds against the wrong metadata.
+</Aside>
+
+
 ## Best Practices
 
 This is just a summary of habits you will find useful when writing components that need to be maintained.
@@ -34,6 +70,8 @@ This is just a summary of habits you will find useful when writing components th
 - Use [Static Scripts](/features/static-scripts) extensively. They make it easier to keep related code in the same place, while separating it properly for HTML optimization.
 - When using [AlpineJS](https://alpinejs.dev/), try to use [`Alpine.data`](https://alpinejs.dev/globals/alpine-data) and [`Alpine.store`](https://alpinejs.dev/globals/alpine-store) over defining in-line state with `x-data`. This will make your code easier to understand and maintain.
 - Do not override the Static Component pipeline unless you *really* need to do so. It genuinely fits 99% of the scenarios in which implementing a component makes sense.
+- Add [`static-attributes`](/reference/static-attributes-tag-helper) to the root element of every input component you ship. You can't anticipate every attribute your users will need, and passthrough saves you from adding a C# property for each of `placeholder`, `autocomplete`, `aria-*`, `data-*` and their Alpine or HTMX bindings.
+- Only add a C# property for an attribute when you need to *act* on its value — branching in the template, validating it, or feeding it to another tag helper. Anything you'd merely copy onto an element should pass through instead.
 </Aside>
 
 ### ASP.NET Core Tag Helper Support
@@ -42,7 +80,7 @@ When using Razor Pages or MVC it is important to use ASP.NET Core official tag h
 
 | Tag Helper | How to integrate | Example |
 |---|---|---|
-| `asp-for` | Use the `ModelExpression` type as a property in your component. | [PinesInput example](https://github.com/techgems/PinesUI/tree/master/Views/Components/PinesInput) |
+| `asp-for` | Expose it on your component as a `ModelExpression` property so consumers bind exactly as they would to a built-in input. Inside your template, hand that expression to the inner element with `static-for` rather than `asp-for` — see [Form inputs](#form-inputs). | [PinesInput example](https://github.com/techgems/PinesUI/tree/master/Views/Components/PinesInput) |
 | `asp-controller`, `asp-action`, `asp-page` | Can be configured on custom Static Components for link generation. | [PinesSidebarLink code-behind](https://github.com/techgems/PinesUI/blob/master/Views/Components/PinesSidebar/PinesSidebarLink.cshtml.cs) and [view](https://github.com/techgems/PinesUI/blob/master/Views/Components/PinesSidebar/PinesSidebarLink.cshtml) |
 
 In general, maintaining ASP.NET Core conventions of usage will make your components better and more consistent for your users.

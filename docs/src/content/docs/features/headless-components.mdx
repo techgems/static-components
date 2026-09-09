@@ -13,6 +13,22 @@ You inherit from one of them, write your Razor template once, and end users of
 your kit can drop the component into a form with `asp-for` just like they would
 with the built-in inputs.
 
+<Aside type="note" title="About the examples on this page">
+The components below are named `PinesInput`, `PinesCheckbox` and so on because
+they're taken from [PinesUI](https://pines-ui.techgems.net/) — a port of
+[DevDojo's Pines](https://devdojo.com/pines) to ASP.NET Core, written with Static
+Components as a proof of concept. It's a complete UI kit built entirely on the
+base classes described here, so its
+[source](https://github.com/techgems/PinesUI) is the most useful reference for
+how these pieces fit together in practice.
+
+The Tailwind classes in the templates are incidental — nothing on this page
+depends on Tailwind, and the same components work with Bootstrap or hand-written
+CSS. Only the [class merging](/features/attribute-passthrough#when-merging-isnt-enough)
+discussion in [Attribute Passthrough](/features/attribute-passthrough) assumes a
+utility-class framework.
+</Aside>
+
 ```csharp
 public class PinesCheckbox : StaticCheckbox { }
 ```
@@ -70,7 +86,7 @@ through this double-binding can keep using `asp-for` as usual.
 
 | Class | Purpose | Maps `asp-for` to |
 |---|---|---|
-| `StaticInputBase` | Root for any input-like component. Exposes `InputExpression`, `ShowLabel`, `Disabled`. | `InputExpression` |
+| `StaticInputBase` | Root for any input-like component. Exposes `InputExpression`, `ShowLabel`, `Disabled` and `AdditionalAttributes`. | `InputExpression` |
 | `StaticInput` | Free-text / number / date / email / password / etc. inputs. | `InputExpression` |
 | `StaticCheckbox` | Checkbox inputs. Adds `Value` (the checked value) and `Checked` (an explicit override). | `InputExpression` |
 | `StaticRadio` | Radio inputs. Adds `Value` (the option this radio represents — required). | `InputExpression` |
@@ -91,6 +107,7 @@ You'll use one of these inside the headless component's template:
 | `static-for` | `<label>` | Sets `for` from the inner expression's name and uses the inner property's `[DisplayName]` (or its property name as a fallback) as the label text. |
 | `static-for` | `<textarea>` | Same as `static-for` on `<input>`, but only `string` is supported. |
 | `static-for` + `static-items` | `<select>` | Renders `<option>` and `<optgroup>` tags. `static-items` accepts an `IEnumerable<SelectListItem>` just like `asp-items`. Selection prefers the bound model value over each item's `Selected` flag. |
+| `static-attributes` | any element | Applies the `AdditionalAttributes` a consumer wrote on your component. See [Attribute Passthrough](/features/attribute-passthrough). |
 
 All of these read the original property's `[Required]`, `[StringLength]`,
 `[Range]`, `[EmailAddress]`, `[Phone]`, `[Url]`, `[RegularExpression]` and
@@ -144,13 +161,18 @@ validation attributes on `AcceptsTerms` / `SendNewsletter`.
 
 ## Building a text input
 
-Inherit from `StaticInput`. You can pass an explicit `type` through to
-`static-for` if you want to lock the input to a specific HTML type; otherwise the
-type is inferred from the model property's CLR type and `[DataType]` attribute.
+Inherit from `StaticInput`. The type is inferred from the model property's CLR
+type and `[DataType]` attribute. `static-for` always owns the `type` attribute,
+so if you want consumers to be able to lock an input to a specific HTML type,
+declare a property for it and write it into the template yourself.
 
 ```csharp
 // ~/Views/Components/PinesInput.cshtml.cs
-public class PinesInput : StaticInput { }
+public class PinesInput : StaticInput
+{
+    [HtmlAttributeName("type")]
+    public string? Type { get; set; }
+}
 ```
 
 ```razor
@@ -164,6 +186,8 @@ public class PinesInput : StaticInput { }
 }
 
 <input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       type="@Model.Type"
        disabled="@(Model.Disabled ? "disabled" : null)"
        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
 ```
@@ -173,6 +197,9 @@ public class PinesInput : StaticInput { }
 <pines-input asp-for="Form.SignupEmail"></pines-input>     @* [DataType(EmailAddress)] → type="email" *@
 <pines-input asp-for="Form.Password" type="password"></pines-input>
 ```
+
+The `static-attributes` on that input is what lets consumers pass arbitrary HTML
+through — see [Attribute Passthrough](/features/attribute-passthrough).
 
 ## Building a radio
 

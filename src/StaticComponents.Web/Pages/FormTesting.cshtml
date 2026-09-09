@@ -49,6 +49,21 @@
     @*TEXTAREA - WORKS WELL*@
     <input-static-text-area show-label="true" asp-for="@Model.TestStringValue" />
 
+    @*ATTRIBUTE PASSTHROUGH*@
+    <input-static-passthrough-test show-label="true"
+                                   asp-for="@Model.TestStringValue"
+                                   placeholder="Consumer overrides the template placeholder"
+                                   class="mt-4"
+                                   data-testid="passthrough"
+                                   autocomplete="off"
+                                   hx-target="#passthrough-feedback"
+                                   required />
+
+    @*ATTRIBUTE PASSTHROUGH - class-replace discards the component's own classes*@
+    <input-static-passthrough-test show-label="false"
+                                   asp-for="@Model.TestStringValue"
+                                   class-replace="w-32 border border-red-500" />
+
     <button type="submit">Submit Test</button>
 
 </form>

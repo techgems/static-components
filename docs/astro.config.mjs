@@ -1,10 +1,16 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://static-components.techgems.net',
+	env: {
+		schema: {
+			// Version shown in the installation instructions. Set in docs/.env.
+			PACKAGE_VERSION: envField.string({ context: 'client', access: 'public' }),
+		},
+	},
 	integrations: [
 		starlight({
 			title: 'Static Components',
@@ -50,7 +56,8 @@ export default defineConfig({
 						{ label: 'Leaf Nodes', slug: 'features/leaf-nodes' },
 						{ label: 'Static Scripts', slug: 'features/static-scripts' },
 						{ label: 'JavaScript Object Serialization', slug: 'features/javascript-object-serialization' },
-						{ label: 'Headless Components', slug: 'features/headless-components' }
+						{ label: 'Headless Components', slug: 'features/headless-components' },
+						{ label: 'Attribute Passthrough', slug: 'features/attribute-passthrough' }
 					]
 				},
 				{
@@ -71,6 +78,7 @@ export default defineConfig({
 						{ label: 'StaticScriptRenderer', slug: 'reference/static-script-renderer' },
 						{ label: 'JavascriptConvert', slug: 'reference/javascript-convert' },
 						{ label: 'StaticInputBase', slug: 'reference/static-input-base' },
+						{ label: 'StaticAttributeCollection', slug: 'reference/static-attribute-collection' },
 						{ label: 'StaticInput', slug: 'reference/static-input' },
 						{ label: 'StaticCheckbox', slug: 'reference/static-checkbox' },
 						{ label: 'StaticRadio', slug: 'reference/static-radio' },
@@ -78,6 +86,7 @@ export default defineConfig({
 						{ label: 'StaticLabel', slug: 'reference/static-label' },
 						{ label: 'StaticButton', slug: 'reference/static-button' },
 						{ label: 'StaticInputTagHelper', slug: 'reference/static-input-tag-helper' },
+						{ label: 'StaticAttributesTagHelper', slug: 'reference/static-attributes-tag-helper' },
 						{ label: 'StaticCheckboxTagHelper', slug: 'reference/static-checkbox-tag-helper' },
 						{ label: 'StaticRadioTagHelper', slug: 'reference/static-radio-tag-helper' },
 						{ label: 'StaticLabelTagHelper', slug: 'reference/static-label-tag-helper' },

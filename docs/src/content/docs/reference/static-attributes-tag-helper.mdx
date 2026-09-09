@@ -1,0 +1,120 @@
+---
+title: 'StaticAttributesTagHelper'
+description: 'API reference for the static-attributes tag helper.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Inherits: TagHelper" variant="note" /> <Badge text="HTML Target: any element" variant="success" />
+
+`StaticAttributesTagHelper` powers `static-attributes`, which applies a
+[`StaticAttributeCollection`](/reference/static-attribute-collection) to the element it's placed on.
+It's how the HTML attributes a consumer writes on your component reach the real markup inside the
+component's template.
+
+Unlike the other `static-*` tag helpers it targets **any** element, so it works on a wrapper `<div>`
+just as well as on the `<input>` itself.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless.TagHelpers
+```
+
+## HTML Target Element
+
+```html
+<any-element static-attributes="@Model.AdditionalAttributes" />
+```
+
+## Usage
+
+```razor
+@model PinesInput
+
+<input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       placeholder="Type something"
+       class="block w-full rounded-md border px-3 py-2" />
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.Email" class="mt-4" data-testid="email" autocomplete="off" required />
+```
+
+```html
+<!-- rendered -->
+<input placeholder="Type something"
+       class="block w-full rounded-md border px-3 py-2 mt-4"
+       data-testid="email" autocomplete="off" required
+       type="text" name="Email" id="Email" value="" />
+```
+
+## Public Properties
+
+### `Attributes`
+
+```csharp
+[HtmlAttributeName("static-attributes")]
+public StaticAttributeCollection? Attributes { get; set; }
+```
+
+The attributes to apply. Normally `@Model.AdditionalAttributes`. A `null` or empty collection is a
+no-op.
+
+### `Order`
+
+```csharp
+public override int Order => -1000;
+```
+
+Runs ahead of the `static-*` tag helpers, which use the default order of `0`. This is what
+guarantees that `name`, `id` and the `data-val-*` attributes derived from the model expression
+always win over anything a consumer passed through — a consumer can't break model binding from the
+outside.
+
+## Merge Rules
+
+| Attribute | Behavior |
+|---|---|
+| `class` | **Merged.** The template's classes come first, the consumer's are appended, duplicates dropped. |
+| `class-replace` | **Replaces.** Discards the template's `class` entirely. Using it together with `class` throws. |
+| `style` | **Merged**, joined with `;`. Inline styles resolve last-declaration-wins, so the consumer's values take effect. |
+| `type` | **Never passed through.** Owned by the `static-*` tag helpers. Applies only to `input` elements. |
+| `name`, `id`, `data-val-*` | **Owned by `static-for`**, which overwrites them afterwards. |
+| everything else | **Consumer wins.** Attributes written in the template act as defaults the consumer can override. |
+
+## Overriding classes
+
+Because `class` merges, a consumer adding a utility that conflicts with one of yours ends up with
+both on the element — and CSS resolves that by stylesheet order, not attribute order, so the
+override may not take effect:
+
+```razor
+<pines-input asp-for="Form.Zip" class="w-32" />   @* w-full is still applied *@
+```
+
+`class-replace` is the escape hatch. It discards the template's classes so there's nothing left to
+conflict with:
+
+```razor
+<pines-input asp-for="Form.Zip" class-replace="w-32 rounded-md border px-3 py-2" />
+```
+
+<Aside type="caution">
+`class-replace` gives up every base style the component defines, so the consumer has to restate the
+ones they still want. Reach for it only when a merge genuinely can't express the override.
+</Aside>
+
+## Error Conditions
+
+| Condition | Exception |
+|---|---|
+| Both `class` and `class-replace` passed to the same element | `ArgumentException` |
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticAttributeCollection](/reference/static-attribute-collection) — the collection this applies.
+- [StaticInputBase](/reference/static-input-base) — exposes it as `AdditionalAttributes`.

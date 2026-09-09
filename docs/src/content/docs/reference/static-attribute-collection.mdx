@@ -1,0 +1,173 @@
+---
+title: 'StaticAttributeCollection'
+description: 'API reference for the collection of passed-through HTML attributes on headless input components.'
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Sealed" variant="caution" /> <Badge text="Implements: IReadOnlyList&lt;TagHelperAttribute&gt;" variant="note" />
+
+`StaticAttributeCollection` holds the HTML attributes a consumer placed on a headless input
+component that were **not** bound to one of its C# properties. Every component inheriting
+[`StaticInputBase`](/reference/static-input-base) exposes one as `AdditionalAttributes`.
+
+You don't construct it yourself — it's populated for you during rendering. In the component's
+Razor template you pass it to an element via the
+[`static-attributes`](/reference/static-attributes-tag-helper) tag helper.
+
+## Namespace
+
+```
+TechGems.StaticComponents.Headless
+```
+
+## Usage
+
+```razor
+@model PinesInput
+
+<input static-for="@Model.InputExpression"
+       static-attributes="@Model.AdditionalAttributes"
+       class="block w-full rounded-md border px-3 py-2" />
+```
+
+## Public Properties
+
+### `Count`
+
+```csharp
+public int Count { get; }
+```
+
+The number of attributes in the collection.
+
+### `this[int index]`
+
+```csharp
+public TagHelperAttribute this[int index] { get; }
+```
+
+The attribute at the given position. Attributes keep the order the consumer wrote them in.
+
+### `this[string name]`
+
+```csharp
+public TagHelperAttribute? this[string name] { get; }
+```
+
+The attribute with the given name, or `null` when it isn't present. Name comparison is
+case-insensitive.
+
+### `Empty`
+
+```csharp
+public static StaticAttributeCollection Empty { get; }
+```
+
+A shared empty collection. Applying it via `static-attributes` is a no-op.
+
+## Public Methods
+
+### `Contains(string name)`
+
+```csharp
+public bool Contains(string name)
+```
+
+Returns `true` when an attribute with the given name is present. Case-insensitive.
+
+### `Only(params string[] names)`
+
+```csharp
+public StaticAttributeCollection Only(params string[] names)
+```
+
+Returns a new collection containing only the named attributes.
+
+### `Except(params string[] names)`
+
+```csharp
+public StaticAttributeCollection Except(params string[] names)
+```
+
+Returns a new collection with the named attributes removed.
+
+### `WithPrefix(params string[] prefixes)`
+
+```csharp
+public StaticAttributeCollection WithPrefix(params string[] prefixes)
+```
+
+Returns a new collection containing only the attributes whose names start with one of the given
+prefixes.
+
+### `WithoutPrefix(params string[] prefixes)`
+
+```csharp
+public StaticAttributeCollection WithoutPrefix(params string[] prefixes)
+```
+
+Returns a new collection with the prefixed attributes removed.
+
+## Routing attributes to different elements
+
+The collection is immutable and every filter returns a new instance, so filters chain. This is the
+main reason the filters exist — a component that renders a wrapper around its input often needs some
+attributes on the wrapper and the rest on the input, because
+[AlpineJS](https://alpinejs.dev/) and [HTMX](https://htmx.org/) attributes act on the element they're
+written on.
+
+`WithPrefix` and `WithoutPrefix` cover the common case. Alpine and HTMX attributes are identified by
+their prefix, so sending everything prefixed `x-` or `hx-` to the wrapper and everything else to the
+input is a one-line split:
+
+```razor
+@model PinesInput
+
+<div class="relative" static-attributes="@Model.AdditionalAttributes.WithPrefix("x-", "hx-")">
+    <label static-for="@Model.InputExpression" class="block text-sm font-medium"></label>
+
+    <input static-for="@Model.InputExpression"
+           static-attributes="@Model.AdditionalAttributes.WithoutPrefix("x-", "hx-")"
+           class="block w-full rounded-md border px-3 py-2" />
+</div>
+```
+
+```razor
+@* consumer view *@
+<pines-input asp-for="Form.Email" x-show="wantsUpdates" hx-target="#feedback" placeholder="you@example.com" />
+```
+
+`x-show` and `hx-target` land on the `<div>`, `placeholder` on the `<input>`.
+
+`Only` and `Except` filter by exact name, for when an attribute needs different placement than its
+prefix suggests. `x-model` is the usual one — it binds an input's value, so it has to stay on the
+`<input>` even though the other `x-` attributes belong on the wrapper. Naming the wrapper's
+attributes rather than matching a prefix leaves everything else on the input:
+
+```razor
+<div class="relative" static-attributes="@Model.AdditionalAttributes.Only("x-show", "x-transition")">
+    <input static-for="@Model.InputExpression"
+           static-attributes="@Model.AdditionalAttributes.Except("x-show", "x-transition")"
+           class="block w-full rounded-md border px-3 py-2" />
+</div>
+```
+
+## What is not captured
+
+`type` is never captured, because the `static-*` tag helpers own it — see
+[StaticInputTagHelper](/reference/static-input-tag-helper). Anything bound to a C# property on the
+component (`asp-for`, `show-label`, `disabled`, and any property you add yourself) never reaches
+the collection either, since it was consumed during model binding.
+
+<Aside type="tip">
+If you want consumers to be able to set an attribute the `static-*` helpers own, declare a property
+for it on your component and write it into the template explicitly rather than relying on
+passthrough.
+</Aside>
+
+## Related
+
+- [Headless Components](/features/headless-components) — Feature guide.
+- [StaticAttributesTagHelper](/reference/static-attributes-tag-helper) — applies the collection to an element.
+- [StaticInputBase](/reference/static-input-base) — exposes it as `AdditionalAttributes`.
