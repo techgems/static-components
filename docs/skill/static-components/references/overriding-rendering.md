@@ -51,8 +51,7 @@ The generic overload is the one to use when the alternate view has its own `@mod
 
 | Member | Notes |
 |---|---|
-| `ViewContext` | Injected by ASP.NET Core; gives access to `HttpContext`. Never set it manually. |
-| `ParentComponent` | `protected`. The enclosing `StaticComponent`, set during `Init`. `null` at the top level. |
+| `ViewContext` | Injected by ASP.NET Core; the getter is `protected`, so overrides read it to reach `HttpContext`. Never set it manually. |
 | `GetHtmlHelper()` | `protected`. Pulls `IHtmlHelper` from `ViewContext`; throws `ArgumentNullException` when `ViewContext` is null. |
 
 ## Overriding on a headless input component

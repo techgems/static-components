@@ -37,10 +37,10 @@ Namespace: `TechGems.StaticComponents.Headless.TagHelpers`
 | `static-radio-for` | `<input>` | Emits `type="radio"`. Requires an explicit `value="…"` and adds `checked` when the bound value matches it. |
 | `static-for` | `<label>` | Sets `for` from the inner expression and uses the property's `[DisplayName]` (falling back to the property name) as the label text. |
 | `static-for` | `<textarea>` | Same as on `<input>`, but only `string` is supported. |
-| `static-for` + `static-items` | `<select>` | Renders `<option>` / `<optgroup>`. `static-items` takes an `IEnumerable<SelectListItem>` just like `asp-items`. |
+| `static-for` + `static-items` | `<select>` | Renders `<option>` / `<optgroup>`. `static-items` takes a `List<SelectListItem>`. |
 | `static-attributes` | any element | Applies the consumer's passed-through attributes. See `attribute-passthrough.md`. |
 
-`static-for` **owns the `type` attribute on inputs** — it always overwrites it. If you want consumers to lock an input to a specific HTML type, declare a property for it and write it into the template yourself.
+`static-for` **owns the `type` attribute on inputs**: it uses an explicit `type="…"` from the template when present and infers it otherwise. A non-empty explicit value must be one of (case-insensitive) `text`, `number`, `date`, `email`, `password`, `tel`, `url`, `search`, `color`, `datetime-local`, `month`, `time`, `week`, `hidden`; anything else throws `ArgumentException`. A consumer's `type` is never passed through, so to let consumers choose it, declare a property for it and write it into the template yourself.
 
 ## Building a text input
 
@@ -221,7 +221,7 @@ Every input/checkbox/radio/select/textarea helper reads the validation attribute
 | `[Range]` | `data-val-range`, `data-val-range-min`, `data-val-range-max` |
 | `[StringLength]` | `data-val-length`, `data-val-length-max`, `data-val-length-min` (when a minimum is set), `maxlength` |
 
-`data-val="true"` is emitted whenever at least one of these is present, so jquery.validate.unobtrusive picks the field up.
+`data-val="true"` is emitted whenever the property carries at least one `ValidationAttribute`-derived attribute, so jquery.validate.unobtrusive picks the field up. A non-nullable value type with no attribute emits `data-val-required` without `data-val="true"`.
 
 ## Reference implementation
 

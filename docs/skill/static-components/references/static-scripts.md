@@ -9,7 +9,7 @@ Use `static-script` as an attribute on a `<script>` tag. It works inside Static 
 | Attribute | Type | Purpose |
 |---|---|---|
 | `static-script` | marker | Required. Marks the script for Static Components processing. |
-| `render-once` | `object` | Renders the script only once per page, regardless of how many times the component is used. Pass the view model (`Model`) — its type is the dedup key. |
+| `render-once` | `object` | Renders the script only once per page, regardless of how many times the component is used. Pass the view model (`Model`) — its type name, without namespace, is the dedup key. |
 | `teleport-script` | `bool` | Moves the script to `<render-static-scripts />` instead of rendering inline. The bare attribute means `true`. |
 | `disable-render` | `bool` | Prevents the script from rendering at all. |
 
@@ -38,7 +38,7 @@ Without it, a component used twice on a page emits its script twice — re-runni
 
 <input asp-for="Model.InputExpression" class="autocomplete" data-mask />
 
-<script static-script type="text/javascript" render-once="Model" defer>
+<script static-script type="text/javascript" render-once="Model">
     var selector = document.querySelector("[data-mask]");
     var im = new Inputmask("(000)-000-0000");
     im.mask(selector);
@@ -54,7 +54,7 @@ Both inputs render; the script renders once.
 
 ## `teleport-script`
 
-Scripts sitting mid-document can execute before the DOM is ready. `defer` helps; teleporting is the robust fix — it moves the script to the bottom of the page while keeping the source next to the markup it belongs to.
+A classic inline script mid-document runs before the markup after it is parsed, and browsers ignore `defer` on inline scripts. Teleporting moves the script to `<render-static-scripts />`, which belongs at the bottom of the layout, while keeping the source next to the markup it belongs to.
 
 ```cshtml
 <script static-script type="text/javascript" render-once="Model" teleport-script>
@@ -76,7 +76,7 @@ Add the collection point to your layout:
 
 Teleported scripts render there wrapped in `<!-- Static Scripts -->` / `<!-- Static Scripts End -->` comments.
 
-Use exactly **one** `<render-static-scripts />` per layout — scripts are consumed from a shared list in `HttpContext.Items`, so a second one renders nothing. If nothing was teleported it suppresses its own output entirely.
+Use exactly **one** `<render-static-scripts />` per layout — every instance renders the whole shared list in `HttpContext.Items` (it is not cleared), so each additional one repeats every teleported script. If nothing was teleported it suppresses its own output entirely.
 
 Note that `teleport-script` alone still renders the script once per component instance. Combine it with `render-once` to also deduplicate.
 

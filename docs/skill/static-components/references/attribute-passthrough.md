@@ -28,7 +28,7 @@ Every component inheriting `StaticInputBase` exposes `AdditionalAttributes` — 
 <input placeholder="you@example.com"
        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm mt-4"
        autocomplete="email" data-testid="email" required
-       type="email" name="Email" id="Email"
+       type="email" name="Form.Email" id="Form_Email"
        data-val="true" data-val-email="…" />
 ```
 

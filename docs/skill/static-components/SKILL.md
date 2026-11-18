@@ -89,7 +89,7 @@ Usage:
 <hello-world-component greet-message="Hello there!"></hello-world-component>
 ```
 
-The view route is derived from the class's full namespace: the assembly name becomes `~`, dots become `/`, and `.cshtml` is appended — so `YourAssembly.Views.Components.AlertComponent` resolves to `~/Views/Components/AlertComponent.cshtml`.
+The view route is derived from the class's full namespace: the assembly name becomes `~`, dots become `/`, and `.cshtml` is appended — so `YourAssembly.Views.Components.AlertComponent` resolves to `~/Views/Components/AlertComponent.cshtml`. `StaticComponent` replaces only the first occurrence of the assembly name in the class's full name; `StaticNode` replaces every occurrence.
 
 ---
 
